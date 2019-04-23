@@ -14,6 +14,7 @@ namespace WeatherHub.FrontEnd
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using WeatherHub.FrontEnd.Services;
 
     public class Startup
     {
@@ -29,6 +30,7 @@ namespace WeatherHub.FrontEnd
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsightsKey"]);
+            services.AddHostedService<WeatherCollector>();
 
             var container = RegisterAutofacServices(services, Configuration);
             return container.Resolve<IServiceProvider>();
@@ -58,8 +60,8 @@ namespace WeatherHub.FrontEnd
             var builder = new ContainerBuilder();
             builder.Populate(services);
 
-            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
-            dbContextOptionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WeatherHub.Domain.Migrations"));
+            // DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
+            // dbContextOptionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WeatherHub.Domain.Migrations"));
 
             /*
             builder.RegisterType<WeatherHubDbContext>()

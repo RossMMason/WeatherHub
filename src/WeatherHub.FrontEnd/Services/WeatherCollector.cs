@@ -11,6 +11,7 @@ namespace WeatherHub.FrontEnd.Services
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
+    using WeatherHub.FrontEnd.Models.Weatherlink;
 
     public class WeatherCollector : IHostedService, IDisposable
     {
@@ -27,7 +28,7 @@ namespace WeatherHub.FrontEnd.Services
         {
             _logger.LogInformation("Weather Collector Service is starting.");
 
-            _timer = new Timer(async e => { await CollectWeather(); }, null, TimeSpan.MaxValue, TimeSpan.MaxValue);
+            _timer = new Timer(async e => { await CollectWeather(); }, null, TimeSpan.FromHours(24), TimeSpan.FromHours(24));
             SynchroniseTimer();
 
             return Task.CompletedTask;
@@ -74,7 +75,7 @@ namespace WeatherHub.FrontEnd.Services
             }
 
             string responseBody = await httpResponse.Content.ReadAsStringAsync();
-            JsonConvert.DeserializeObject<object>(jsonString);
+            var result = JsonConvert.DeserializeObject<NoaaExtResult>(responseBody);
 
             // https://api.weatherlink.com/v1/NoaaExt.json?user=001D0A8083DF&pass=derbyshire18&apiToken=E78E69894E0D4BBA9FC6B35AE81AE9F2
             // https://api.weatherlink.com/v1/StationStatus.json?user=001D0A8083DF&pass=derbyshire18&apiToken=E78E69894E0D4BBA9FC6B35AE81AE9F2
@@ -95,7 +96,9 @@ namespace WeatherHub.FrontEnd.Services
             }
 
             // Weather is received at 00, 15, 30, 45 minutes past the hour. So we attempt to collect them at 01, 16, 31 and 45 minutes past the hour.
-            var nextCollection = TimeSpan.FromMinutes((DateTime.UtcNow.TimeOfDay.TotalMinutes % 15) + 1);
+            var minsPast15MinInterval = DateTime.UtcNow.TimeOfDay.TotalMinutes % 15;
+            var minsToNext15MinInterval = 15 - minsPast15MinInterval;
+            var nextCollection = TimeSpan.FromMinutes(minsToNext15MinInterval + 1);
             _timer.Change(nextCollection, _fifteenMinutes);
         }
     }
