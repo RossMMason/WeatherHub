@@ -30,7 +30,7 @@ namespace WeatherHub.FrontEnd.Models.Weatherlink
 
         // "43"
         [JsonProperty("dewpoint_day_low_f")]
-        public string DewpoindDayLow { get; set; }
+        public string DewpointDayLow { get; set; }
 
         // "1:00am"
         [JsonProperty("dewpoint_day_low_time")]
