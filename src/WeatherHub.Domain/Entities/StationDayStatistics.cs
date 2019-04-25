@@ -1,8 +1,12 @@
-﻿using System;
+﻿// <copyright file="StationDayStatistics.cs" company="Ross Mason">
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
-namespace WeatherHub.Database.Model
+namespace WeatherHub.Domain.Entities
 {
-    public class StationDayStatistics
+    using System;
+
+    public class StationDayStatistics : IVersionedEntity
     {
         public Guid Id { get; set; }
 
@@ -62,5 +66,6 @@ namespace WeatherHub.Database.Model
 
         public TimeSpan WindChillLowTime { get; set; }
 
+        public byte[] Version { get; set; }
     }
 }

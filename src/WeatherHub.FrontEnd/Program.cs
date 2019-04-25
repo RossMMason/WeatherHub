@@ -6,6 +6,7 @@ namespace WeatherHub.FrontEnd
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
 
     public class Program
     {
@@ -16,6 +17,11 @@ namespace WeatherHub.FrontEnd
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, configuration) =>
+                    {
+                        configuration.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
+                        configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    })
                 .UseApplicationInsights()
                 .UseStartup<Startup>();
     }

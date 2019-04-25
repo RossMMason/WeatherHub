@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherHub.FrontEnd", "Weat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DB", "DB", "{209E9D0C-507B-48FB-9787-EBD9B0FB9B18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Database.Model", "WeatherHub.Database.Model\WeatherHub.Database.Model.csproj", "{F5AE35F2-7BC0-46D2-A896-3B824209060F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Domain", "WeatherHub.Domain\WeatherHub.Domain.csproj", "{D2A5BB31-ACD1-4AF6-903C-060FAE2DE106}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Database.Migrations", "WeatherHub.Database.Migrations\WeatherHub.Database.Migrations.csproj", "{5AC12929-3293-4B07-8725-980454F1C2F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Domain.Migrations", "WeatherHub.Domain.Migrations\WeatherHub.Domain.Migrations.csproj", "{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,21 +21,21 @@ Global
 		{B512854C-5472-4B1F-A5C3-809642D98C66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B512854C-5472-4B1F-A5C3-809642D98C66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B512854C-5472-4B1F-A5C3-809642D98C66}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5AE35F2-7BC0-46D2-A896-3B824209060F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F5AE35F2-7BC0-46D2-A896-3B824209060F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F5AE35F2-7BC0-46D2-A896-3B824209060F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F5AE35F2-7BC0-46D2-A896-3B824209060F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AC12929-3293-4B07-8725-980454F1C2F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AC12929-3293-4B07-8725-980454F1C2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AC12929-3293-4B07-8725-980454F1C2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5AC12929-3293-4B07-8725-980454F1C2F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2A5BB31-ACD1-4AF6-903C-060FAE2DE106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2A5BB31-ACD1-4AF6-903C-060FAE2DE106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2A5BB31-ACD1-4AF6-903C-060FAE2DE106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2A5BB31-ACD1-4AF6-903C-060FAE2DE106}.Release|Any CPU.Build.0 = Release|Any CPU
+		{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{F5AE35F2-7BC0-46D2-A896-3B824209060F} = {209E9D0C-507B-48FB-9787-EBD9B0FB9B18}
-		{5AC12929-3293-4B07-8725-980454F1C2F3} = {209E9D0C-507B-48FB-9787-EBD9B0FB9B18}
+		{D2A5BB31-ACD1-4AF6-903C-060FAE2DE106} = {209E9D0C-507B-48FB-9787-EBD9B0FB9B18}
+		{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7} = {209E9D0C-507B-48FB-9787-EBD9B0FB9B18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2E256221-A5D2-4777-838E-368A4CA61DFC}

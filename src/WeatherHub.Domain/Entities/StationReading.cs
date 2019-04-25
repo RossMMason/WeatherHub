@@ -1,8 +1,12 @@
-﻿using System;
+﻿// <copyright file="StationReading.cs" company="Ross Mason">
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
-namespace WeatherHub.Database.Model
+namespace WeatherHub.Domain.Entities
 {
-    public class StationReading
+    using System;
+
+    public class StationReading : IVersionedEntity
     {
         public Guid Id { get; set; }
 
@@ -29,5 +33,7 @@ namespace WeatherHub.Database.Model
         public float WindChillC { get; set; }
 
         public float RainCmPerHour { get; set; }
+
+        public byte[] Version { get; set; }
     }
 }

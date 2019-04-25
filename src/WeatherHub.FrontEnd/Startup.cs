@@ -5,6 +5,7 @@
 namespace WeatherHub.FrontEnd
 {
     using System;
+    using System.Reflection;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Builder;
@@ -14,6 +15,8 @@ namespace WeatherHub.FrontEnd
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using WeatherHub.Domain;
+    using WeatherHub.Domain.Migrations;
     using WeatherHub.FrontEnd.Services;
 
     public class Startup
@@ -37,8 +40,21 @@ namespace WeatherHub.FrontEnd
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, WeatherHubDbContext weatherHubDbContext)
         {
+            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                try
+                {
+                    scope.ServiceProvider.GetRequiredService<MigrationDbContext>().Database.Migrate();
+                }
+                catch (Exception ex)
+                {
+                    var migrationLogger = loggerFactory.CreateLogger("DB Migration");
+                    migrationLogger.LogError(ex, "DB Migration Failed");
+                }
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -60,33 +76,25 @@ namespace WeatherHub.FrontEnd
             var builder = new ContainerBuilder();
             builder.Populate(services);
 
-            // DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
-            // dbContextOptionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WeatherHub.Domain.Migrations"));
+            DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
+            dbContextOptionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WeatherHub.Domain.Migrations"));
 
-            /*
             builder.RegisterType<WeatherHubDbContext>()
                 .AsImplementedInterfaces()
                 .AsSelf()
                 .WithParameter("options", dbContextOptionsBuilder.Options)
                 .InstancePerLifetimeScope();
 
-            builder.RegisterAssemblyTypes(new[] { typeof(PdgHelicopters.Domain.Entity.Windfarm).Assembly })
+            builder.RegisterType<MigrationDbContext>()
+               .AsSelf()
+               .WithParameter("options", dbContextOptionsBuilder.Options)
+               .InstancePerLifetimeScope();
+
+            /*builder.RegisterAssemblyTypes(new[] { typeof(WeatherHub.Domain.WeatherHubDbContext).Assembly })
                 .Where(x => ((TypeInfo)x).ImplementedInterfaces.Where(y => y.IsGenericType).Any(z => z.GetGenericTypeDefinition() == typeof(IRepository<>)))
                 .AsSelf()
                 .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
-
-            Base64EncodedKeyGenerator keyGen = new Base64EncodedKeyGenerator(64);
-            builder.RegisterInstance(keyGen)
-                .AsImplementedInterfaces()
-                .SingleInstance();
-
-            // TODO
-            builder.RegisterType<EmailSender>()
-                .AsImplementedInterfaces()
-                .SingleInstance();
-
-           */
+                .InstancePerLifetimeScope();*/
 
             return builder.Build();
         }
