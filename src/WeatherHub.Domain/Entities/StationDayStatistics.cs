@@ -26,19 +26,15 @@ namespace WeatherHub.Domain.Entities
 
         public TimeSpan HeatIndexHighTime { get; set; }
 
-        public float HeatIndexLowC { get; set; }
-
-        public TimeSpan HeatIndexLowTime { get; set; }
-
-        public float PressureHighC { get; set; }
+        public float PressureHighMbar { get; set; }
 
         public TimeSpan PressureHighTime { get; set; }
 
-        public float PressureLowC { get; set; }
+        public float PressureLowMbar { get; set; }
 
         public TimeSpan PressureLowTime { get; set; }
 
-        public decimal TotalRainCm { get; set; }
+        public float TotalRainCm { get; set; }
 
         public float RainRateHighCmPerHour { get; set; }
 
@@ -60,9 +56,9 @@ namespace WeatherHub.Domain.Entities
 
         public float WindHighMph { get; set; }
 
-        public TimeSpan WidHighTime { get; set; }
+        public TimeSpan WindHighTime { get; set; }
 
-        public float WindChillLow { get; set; }
+        public float WindChillLowC { get; set; }
 
         public TimeSpan WindChillLowTime { get; set; }
 

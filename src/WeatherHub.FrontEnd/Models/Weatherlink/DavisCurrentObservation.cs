@@ -22,23 +22,23 @@ namespace WeatherHub.FrontEnd.Models.Weatherlink
 
         // "43"
         [JsonProperty("dewpoint_day_high_f")]
-        public string DewpoindDayHigh { get; set; }
+        public string DewpointDayHighF { get; set; }
 
         // "1:00am"
         [JsonProperty("dewpoint_day_high_time")]
-        public string DewpoindDayHighTime { get; set; }
+        public string DewpointDayHighTime { get; set; }
 
         // "43"
         [JsonProperty("dewpoint_day_low_f")]
-        public string DewpointDayLow { get; set; }
+        public string DewpointDayLowF { get; set; }
 
         // "1:00am"
         [JsonProperty("dewpoint_day_low_time")]
-        public string DewpoindDayLowTime { get; set; }
+        public string DewpointDayLowTime { get; set; }
 
         // "44"
         [JsonProperty("heat_index_day_high_f")]
-        public string HeatIndexDayHigh { get; set; }
+        public string HeatIndexDayHighF { get; set; }
 
         // "1:00am"
         [JsonProperty("heat_index_day_high_time")]
@@ -134,7 +134,7 @@ namespace WeatherHub.FrontEnd.Models.Weatherlink
 
         // "17.0"
         [JsonProperty("wind_day_high_mph")]
-        public string WindDayHigh { get; set; }
+        public string WindDayHighMph { get; set; }
 
         // "1:23am"
         [JsonProperty("wind_day_high_time")]

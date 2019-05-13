@@ -20,7 +20,7 @@ namespace WeatherHub.Domain
 
         public DbSet<StationReading> StationReading { get; set; }
 
-        public DbSet<WeatherStation> WeatherStation { get; set; }
+        public DbSet<WeatherStation> WeatherStations { get; set; }
 
         public DbSet<FetcherSetting> FetcherSetting { get; set; }
 

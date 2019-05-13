@@ -52,7 +52,7 @@ namespace WeatherHub.FrontEnd.Models.Weatherlink
         [JsonProperty("observation_time")]
         public string ObservationTime { get; set; }
 
-        // "Last Updated on Apr 18 2019, 1:30 am BST"
+        // "Thu, 18 Apr 2019 01:30:00 +0100"
         [JsonProperty("observation_time_rfc822")]
         public string ObservationTimeRfc822 { get; set; }
 

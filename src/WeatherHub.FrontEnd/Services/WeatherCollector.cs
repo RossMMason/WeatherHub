@@ -5,101 +5,64 @@
 namespace WeatherHub.FrontEnd.Services
 {
     using System;
-    using System.Net.Http;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
-    using WeatherHub.FrontEnd.Models.Weatherlink;
+    using WeatherHub.Domain.Entities;
+    using WeatherHub.Domain.Repositories;
 
-    public class WeatherCollector : IHostedService, IDisposable
+    public class WeatherCollector : IHostedService
     {
-        private readonly TimeSpan _fifteenMinutes = TimeSpan.FromMinutes(15);
-        private readonly ILogger _logger;
-        private Timer _timer;
+        private Dictionary<Guid, IWeatherDataFetcher> _weatherFetchers =
+            new Dictionary<Guid, IWeatherDataFetcher>();
 
-        public WeatherCollector(ILogger<WeatherCollector> logger)
+        private ILogger<WeatherCollector> _logger;
+        private IWeatherStationRepository _weatherStationRepository;
+
+        public WeatherCollector(
+            ILogger<WeatherCollector> logger,
+            IWeatherStationRepository weatherStationRepository)
         {
             _logger = logger;
+            _weatherStationRepository = weatherStationRepository;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Weather Collector Service is starting.");
+            _logger.LogInformation("Starting up weather fetcher services");
 
-            _timer = new Timer(async e => { await CollectWeather(); }, null, TimeSpan.FromHours(24), TimeSpan.FromHours(24));
-            SynchroniseTimer();
+            IEnumerable<WeatherStation> stations = await _weatherStationRepository.GetAllAsync();
 
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("Weather Collector Service is stopping.");
-
-            _timer?.Change(Timeout.Infinite, 0);
-
-            return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _timer?.Dispose();
-        }
-
-        private async Task CollectWeather()
-        {
-            HttpResponseMessage httpResponse;
-
-            try
+            foreach (WeatherStation station in stations)
             {
-                HttpClient client = new HttpClient();
-                httpResponse = await client.GetAsync("https://api.weatherlink.com/v1/NoaaExt.json?user=001D0A8083DF&pass=derbyshire18&apiToken=E78E69894E0D4BBA9FC6B35AE81AE9F2");
-
-                if (!httpResponse.IsSuccessStatusCode)
-                {
-                    _logger.LogError($"Could not query weather API. Response code was {httpResponse.StatusCode}");
-
-                    // If response code indicates an error. Back off for one minute then try again.
-                    SynchroniseTimer(TimeSpan.FromMinutes(1));
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception trying to receive weather information from API.");
-
-                // If we hit an exception. Back off for one minute then try again.
-                SynchroniseTimer(TimeSpan.FromMinutes(1));
-                return;
+                CreateFetcherForStation(station);
             }
 
-            string responseBody = await httpResponse.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<NoaaExtResult>(responseBody);
+            _logger.LogInformation($"Attempting to start {_weatherFetchers.Count} weather data fetchers.");
 
-            // https://api.weatherlink.com/v1/NoaaExt.json?user=001D0A8083DF&pass=derbyshire18&apiToken=E78E69894E0D4BBA9FC6B35AE81AE9F2
-            // https://api.weatherlink.com/v1/StationStatus.json?user=001D0A8083DF&pass=derbyshire18&apiToken=E78E69894E0D4BBA9FC6B35AE81AE9F2
-            SynchroniseTimer();
+            Task[] startTasks = _weatherFetchers.Values.Select(x => x.StartAsync()).ToArray();
+            await Task.WhenAll(startTasks);
+
+            _logger.LogInformation($"Startup complete.");
         }
 
-        private void SynchroniseTimer()
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            SynchroniseTimer(null);
+            _logger.LogInformation($"Attempting to shutdown and stop {_weatherFetchers.Count} weather data fetchers.");
+
+            Task[] stopTasks = _weatherFetchers.Values.Select(x => x.StopAsync()).ToArray();
+
+            await Task.WhenAll(stopTasks);
+
+            _logger.LogInformation($"Shutdown complete.");
         }
 
-        private void SynchroniseTimer(TimeSpan? overrideDelay)
+        private void CreateFetcherForStation(WeatherStation station)
         {
-            if (overrideDelay.HasValue)
-            {
-                _timer.Change(overrideDelay.Value, overrideDelay.Value);
-                return;
-            }
-
-            // Weather is received at 00, 15, 30, 45 minutes past the hour. So we attempt to collect them at 01, 16, 31 and 45 minutes past the hour.
-            var minsPast15MinInterval = DateTime.UtcNow.TimeOfDay.TotalMinutes % 15;
-            var minsToNext15MinInterval = 15 - minsPast15MinInterval;
-            var nextCollection = TimeSpan.FromMinutes(minsToNext15MinInterval + 1);
-            _timer.Change(nextCollection, _fifteenMinutes);
+            station.FetcherType.
         }
     }
 }

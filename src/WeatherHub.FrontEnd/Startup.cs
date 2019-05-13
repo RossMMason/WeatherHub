@@ -5,7 +5,6 @@
 namespace WeatherHub.FrontEnd
 {
     using System;
-    using System.Reflection;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Builder;
@@ -33,6 +32,7 @@ namespace WeatherHub.FrontEnd
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsightsKey"]);
+
             services.AddHostedService<WeatherCollector>();
 
             var container = RegisterAutofacServices(services, Configuration);

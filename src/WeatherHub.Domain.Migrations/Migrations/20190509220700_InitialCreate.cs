@@ -8,7 +8,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "WeatherStation",
+                name: "WeatherStations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -23,7 +23,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WeatherStation", x => x.Id);
+                    table.PrimaryKey("PK_WeatherStations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -40,9 +40,9 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     table.PrimaryKey("PK_FetcherSetting", x => x.Id)
                         .Annotation("SqlServer:Clustered", false);
                     table.ForeignKey(
-                        name: "FK_FetcherSetting_WeatherStation_StationId",
+                        name: "FK_FetcherSetting_WeatherStations_StationId",
                         column: x => x.StationId,
-                        principalTable: "WeatherStation",
+                        principalTable: "WeatherStations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -60,13 +60,11 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     DewpointLowTime = table.Column<TimeSpan>(nullable: false),
                     HeatIndexHighC = table.Column<float>(nullable: false),
                     HeatIndexHighTime = table.Column<TimeSpan>(nullable: false),
-                    HeatIndexLowC = table.Column<float>(nullable: false),
-                    HeatIndexLowTime = table.Column<TimeSpan>(nullable: false),
-                    PressureHighC = table.Column<float>(nullable: false),
+                    PressureHighMbar = table.Column<float>(nullable: false),
                     PressureHighTime = table.Column<TimeSpan>(nullable: false),
-                    PressureLowC = table.Column<float>(nullable: false),
+                    PressureLowMbar = table.Column<float>(nullable: false),
                     PressureLowTime = table.Column<TimeSpan>(nullable: false),
-                    TotalRainCm = table.Column<decimal>(nullable: false),
+                    TotalRainCm = table.Column<float>(nullable: false),
                     RainRateHighCmPerHour = table.Column<float>(nullable: false),
                     RelativeHumidityHigh = table.Column<float>(nullable: false),
                     RelativeHumidyHighTime = table.Column<TimeSpan>(nullable: false),
@@ -77,8 +75,8 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     TempLowC = table.Column<float>(nullable: false),
                     TempLowTime = table.Column<TimeSpan>(nullable: false),
                     WindHighMph = table.Column<float>(nullable: false),
-                    WidHighTime = table.Column<TimeSpan>(nullable: false),
-                    WindChillLow = table.Column<float>(nullable: false),
+                    WindHighTime = table.Column<TimeSpan>(nullable: false),
+                    WindChillLowC = table.Column<float>(nullable: false),
                     WindChillLowTime = table.Column<TimeSpan>(nullable: false),
                     Version = table.Column<byte[]>(rowVersion: true, nullable: true)
                 },
@@ -87,9 +85,9 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     table.PrimaryKey("PK_StationDayStatistics", x => x.Id)
                         .Annotation("SqlServer:Clustered", false);
                     table.ForeignKey(
-                        name: "FK_StationDayStatistics_WeatherStation_StationId",
+                        name: "FK_StationDayStatistics_WeatherStations_StationId",
                         column: x => x.StationId,
-                        principalTable: "WeatherStation",
+                        principalTable: "WeatherStations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -104,7 +102,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     DewpointC = table.Column<float>(nullable: false),
                     HeatIndexC = table.Column<float>(nullable: false),
                     PressureMb = table.Column<float>(nullable: false),
-                    RelativeHuimidity = table.Column<float>(nullable: false),
+                    RelativeHumidity = table.Column<float>(nullable: false),
                     TempC = table.Column<float>(nullable: false),
                     WindDegrees = table.Column<float>(nullable: false),
                     WindMph = table.Column<float>(nullable: false),
@@ -118,9 +116,9 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     table.PrimaryKey("PK_StationReading", x => x.Id)
                         .Annotation("SqlServer:Clustered", false);
                     table.ForeignKey(
-                        name: "FK_StationReading_WeatherStation_StationId",
+                        name: "FK_StationReading_WeatherStations_StationId",
                         column: x => x.StationId,
-                        principalTable: "WeatherStation",
+                        principalTable: "WeatherStations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -147,8 +145,8 @@ namespace WeatherHub.Domain.Migrations.Migrations
                 .Annotation("SqlServer:Clustered", true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_WeatherStation_Name",
-                table: "WeatherStation",
+                name: "IX_WeatherStations_Name",
+                table: "WeatherStations",
                 column: "Name");
         }
 
@@ -164,7 +162,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
                 name: "StationReading");
 
             migrationBuilder.DropTable(
-                name: "WeatherStation");
+                name: "WeatherStations");
         }
     }
 }

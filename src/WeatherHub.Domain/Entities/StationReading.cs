@@ -20,7 +20,7 @@ namespace WeatherHub.Domain.Entities
 
         public float PressureMb { get; set; }
 
-        public float RelativeHuimidity { get; set; }
+        public float RelativeHumidity { get; set; }
 
         public float TempC { get; set; }
 

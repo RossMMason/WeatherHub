@@ -10,7 +10,7 @@ using WeatherHub.Domain.Migrations;
 namespace WeatherHub.Domain.Migrations.Migrations
 {
     [DbContext(typeof(MigrationDbContext))]
-    [Migration("20190425021914_InitialCreate")]
+    [Migration("20190509220700_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,15 +64,11 @@ namespace WeatherHub.Domain.Migrations.Migrations
 
                     b.Property<TimeSpan>("HeatIndexHighTime");
 
-                    b.Property<float>("HeatIndexLowC");
-
-                    b.Property<TimeSpan>("HeatIndexLowTime");
-
-                    b.Property<float>("PressureHighC");
+                    b.Property<float>("PressureHighMbar");
 
                     b.Property<TimeSpan>("PressureHighTime");
 
-                    b.Property<float>("PressureLowC");
+                    b.Property<float>("PressureLowMbar");
 
                     b.Property<TimeSpan>("PressureLowTime");
 
@@ -96,19 +92,19 @@ namespace WeatherHub.Domain.Migrations.Migrations
 
                     b.Property<TimeSpan>("TempLowTime");
 
-                    b.Property<decimal>("TotalRainCm");
+                    b.Property<float>("TotalRainCm");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate();
 
-                    b.Property<TimeSpan>("WidHighTime");
-
-                    b.Property<float>("WindChillLow");
+                    b.Property<float>("WindChillLowC");
 
                     b.Property<TimeSpan>("WindChillLowTime");
 
                     b.Property<float>("WindHighMph");
+
+                    b.Property<TimeSpan>("WindHighTime");
 
                     b.HasKey("Id")
                         .HasAnnotation("SqlServer:Clustered", false);
@@ -133,7 +129,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
 
                     b.Property<float>("RainCmPerHour");
 
-                    b.Property<float>("RelativeHuimidity");
+                    b.Property<float>("RelativeHumidity");
 
                     b.Property<Guid?>("StationId");
 
@@ -194,7 +190,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("WeatherStation");
+                    b.ToTable("WeatherStations");
                 });
 
             modelBuilder.Entity("WeatherHub.Domain.Entities.FetcherSetting", b =>
