@@ -16,22 +16,26 @@ namespace WeatherHub.FrontEnd.Services
 
     public class WeatherCollector : IHostedService
     {
-        private Dictionary<Guid, IWeatherDataFetcher> _weatherFetchers =
-            new Dictionary<Guid, IWeatherDataFetcher>();
+        private readonly ILogger<WeatherCollector> _logger;
+        private readonly IWeatherStationRepository _weatherStationRepository;
+        private readonly Func<WeatherStation, IWeatherDataFetcher> _weatherDataFetcherFactory;
 
-        private ILogger<WeatherCollector> _logger;
-        private IWeatherStationRepository _weatherStationRepository;
+        private List<IWeatherDataFetcher> _weatherDataFetchers;
 
         public WeatherCollector(
             ILogger<WeatherCollector> logger,
-            IWeatherStationRepository weatherStationRepository)
+            IWeatherStationRepository weatherStationRepository,
+            Func<WeatherStation, IWeatherDataFetcher> weatherDataFetcherFactory)
         {
             _logger = logger;
             _weatherStationRepository = weatherStationRepository;
+            _weatherDataFetcherFactory = weatherDataFetcherFactory;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            _weatherDataFetchers = new List<IWeatherDataFetcher>();
+
             _logger.LogInformation("Starting up weather fetcher services");
 
             IEnumerable<WeatherStation> stations = await _weatherStationRepository.GetAllAsync();
@@ -41,9 +45,9 @@ namespace WeatherHub.FrontEnd.Services
                 CreateFetcherForStation(station);
             }
 
-            _logger.LogInformation($"Attempting to start {_weatherFetchers.Count} weather data fetchers.");
+            _logger.LogInformation($"Attempting to start {_weatherDataFetchers.Count} weather data fetchers.");
 
-            Task[] startTasks = _weatherFetchers.Values.Select(x => x.StartAsync()).ToArray();
+            Task[] startTasks = _weatherDataFetchers.Select(x => x.StartAsync()).ToArray();
             await Task.WhenAll(startTasks);
 
             _logger.LogInformation($"Startup complete.");
@@ -51,18 +55,31 @@ namespace WeatherHub.FrontEnd.Services
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation($"Attempting to shutdown and stop {_weatherFetchers.Count} weather data fetchers.");
+            _logger.LogInformation($"Attempting to shutdown and stop {_weatherDataFetchers.Count} weather data fetchers.");
 
-            Task[] stopTasks = _weatherFetchers.Values.Select(x => x.StopAsync()).ToArray();
+            Task[] stopTasks = _weatherDataFetchers.Select(x => x.StopAsync()).ToArray();
 
             await Task.WhenAll(stopTasks);
+
+            _weatherDataFetchers.Clear();
 
             _logger.LogInformation($"Shutdown complete.");
         }
 
         private void CreateFetcherForStation(WeatherStation station)
         {
-            station.FetcherType.
+            try
+            {
+                _logger.LogInformation($"Trying to create fetcher for station: {station.Id}");
+                _weatherDataFetchers.Add(_weatherDataFetcherFactory(station));
+                _logger.LogInformation($"Created fetcher for station: {station.Id}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    $"Could not create fetcher for station: {station.Id}. This is probably because the fetcher type was not registered on app startup.");
+            }
         }
     }
 }

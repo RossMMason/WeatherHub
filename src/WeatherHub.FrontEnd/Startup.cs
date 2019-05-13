@@ -15,7 +15,9 @@ namespace WeatherHub.FrontEnd
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using WeatherHub.Domain;
+    using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Migrations;
+    using WeatherHub.Domain.Repositories;
     using WeatherHub.FrontEnd.Services;
 
     public class Startup
@@ -89,6 +91,25 @@ namespace WeatherHub.FrontEnd
                .AsSelf()
                .WithParameter("options", dbContextOptionsBuilder.Options)
                .InstancePerLifetimeScope();
+
+            builder.Register<Func<WeatherStation, IWeatherDataFetcher>>(c =>
+            {
+                return (ws) =>
+                {
+                    switch (ws.FetcherType)
+                    {
+                        case "DavisWeatherlinkFetcher":
+                            return new DavisWeatherlinkFetcher(
+                                c.Resolve<ILogger<DavisWeatherlinkFetcher>>(),
+                                ws,
+                                c.Resolve<IDbContext>(),
+                                c.Resolve<IStationReadingRepository>(),
+                                c.Resolve<IStationDayStatisticsRepository>());
+                        default:
+                            throw new Exception($"Unsupported fetcher type: {ws.FetcherType}");
+                    }
+                };
+            });
 
             /*builder.RegisterAssemblyTypes(new[] { typeof(WeatherHub.Domain.WeatherHubDbContext).Assembly })
                 .Where(x => ((TypeInfo)x).ImplementedInterfaces.Where(y => y.IsGenericType).Any(z => z.GetGenericTypeDefinition() == typeof(IRepository<>)))

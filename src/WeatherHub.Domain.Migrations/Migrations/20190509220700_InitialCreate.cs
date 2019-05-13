@@ -1,8 +1,12 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿// <copyright file="20190509220700_InitialCreate.cs" company="Ross Mason">
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
 namespace WeatherHub.Domain.Migrations.Migrations
 {
+    using System;
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

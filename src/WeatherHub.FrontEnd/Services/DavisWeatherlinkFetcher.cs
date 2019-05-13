@@ -20,25 +20,26 @@ namespace WeatherHub.FrontEnd.Services
     public class DavisWeatherlinkFetcher
         : TimerBasedWeatherDataFetcher
     {
+        private readonly string _user;
+        private readonly string _password;
+        private readonly FetcherSetting _apiToken;
+        private readonly int _pickupPeriod;
+        private readonly TimeZoneInfo _timeZone;
+        private CancellationTokenSource _cancellationTokenSource;
+
         private ILogger _logger;
         private WeatherStation _weatherStation;
         private IDbContext _dbContext;
         private IStationReadingRepository _stationReadingRepository;
-        private IStationDayStatistics _stationDayStatisticsRepository;
+        private IStationDayStatisticsRepository _stationDayStatisticsRepository;
         private TimeSpan _oneMinute = TimeSpan.FromMinutes(1);
-        private string _user;
-        private string _password;
-        private FetcherSetting _apiToken;
-        private int _pickupPeriod;
-        private TimeZoneInfo _timeZone;
-        private CancellationTokenSource _cancellationTokenSource;
 
         public DavisWeatherlinkFetcher(
-            ILogger<DavisWeatherlinkFetcher> logger, 
+            ILogger<DavisWeatherlinkFetcher> logger,
             WeatherStation weatherStation,
             IDbContext dbContext,
             IStationReadingRepository stationReadingRepository,
-            IStationDayStatistics stationDayStatisticsRepository)
+            IStationDayStatisticsRepository stationDayStatisticsRepository)
             : base(logger)
         {
             _logger = logger;

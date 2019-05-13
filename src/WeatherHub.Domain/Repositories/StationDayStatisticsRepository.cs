@@ -12,7 +12,7 @@ namespace WeatherHub.Domain.Repositories
     using WeatherHub.Domain.Entities;
 
     public class StationDayStatisticsRepository
-        : Repository<StationDayStatistics>, IStationDayStatistics
+        : Repository<StationDayStatistics>, IStationDayStatisticsRepository
     {
         private readonly WeatherHubDbContext _dbContext;
 
