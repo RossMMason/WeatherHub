@@ -25,6 +25,7 @@ namespace WeatherHub.Domain.Repositories
         {
             return await _dbContext
                 .WeatherStations
+                .Include(x => x.FetcherSettings)
                 .ToListAsync();
         }
 
@@ -32,6 +33,7 @@ namespace WeatherHub.Domain.Repositories
         {
             return await _dbContext
                 .WeatherStations
+                .Include(x => x.FetcherSettings)
                 .SingleOrDefaultAsync(x => x.Id == id);
         }
     }

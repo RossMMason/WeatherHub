@@ -5,6 +5,8 @@
 namespace WeatherHub.FrontEnd
 {
     using System;
+    using System.Linq;
+    using System.Reflection;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Builder;
@@ -94,28 +96,30 @@ namespace WeatherHub.FrontEnd
 
             builder.Register<Func<WeatherStation, IWeatherDataFetcher>>(c =>
             {
+                var context = c.Resolve<IComponentContext>();
+
                 return (ws) =>
                 {
                     switch (ws.FetcherType)
                     {
                         case "DavisWeatherlinkFetcher":
                             return new DavisWeatherlinkFetcher(
-                                c.Resolve<ILogger<DavisWeatherlinkFetcher>>(),
+                                context.Resolve<ILogger<DavisWeatherlinkFetcher>>(),
                                 ws,
-                                c.Resolve<IDbContext>(),
-                                c.Resolve<IStationReadingRepository>(),
-                                c.Resolve<IStationDayStatisticsRepository>());
+                                context.Resolve<IDbContext>(),
+                                context.Resolve<IStationReadingRepository>(),
+                                context.Resolve<IStationDayStatisticsRepository>());
                         default:
                             throw new Exception($"Unsupported fetcher type: {ws.FetcherType}");
                     }
                 };
             });
 
-            /*builder.RegisterAssemblyTypes(new[] { typeof(WeatherHub.Domain.WeatherHubDbContext).Assembly })
+            builder.RegisterAssemblyTypes(new[] { typeof(WeatherHub.Domain.WeatherHubDbContext).Assembly })
                 .Where(x => ((TypeInfo)x).ImplementedInterfaces.Where(y => y.IsGenericType).Any(z => z.GetGenericTypeDefinition() == typeof(IRepository<>)))
                 .AsSelf()
                 .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();*/
+                .InstancePerLifetimeScope();
 
             return builder.Build();
         }

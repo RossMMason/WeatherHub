@@ -29,7 +29,7 @@ namespace WeatherHub.FrontEnd.Services
         {
             _logger.LogInformation("Timed weather collection service is starting.");
 
-            _timer = new Timer(async e => { await TriggerWeatherCollection(); }, null, TimeSpan.FromDays(1000), TimeSpan.FromDays(1000));
+            _timer = new Timer(async e => { await TriggerWeatherCollection(); }, null, TimeSpan.FromDays(10), TimeSpan.FromDays(10));
             SynchroniseTimer();
 
             _isRunning = true;
@@ -146,13 +146,13 @@ namespace WeatherHub.FrontEnd.Services
                 currentTime.Day,
                 currentTime.Hour,
                 currentTime.Minute,
-                currentTime.Second);
+                0);
 
-            nextCollection.Add(oneMinute);
+            nextCollection = nextCollection.Add(oneMinute);
 
             while (nextCollection.Minute != nextInterval)
             {
-                nextCollection.Add(oneMinute);
+                nextCollection = nextCollection.Add(oneMinute);
             }
 
             _timer.Change(nextCollection - currentTime, Timeout.InfiniteTimeSpan);

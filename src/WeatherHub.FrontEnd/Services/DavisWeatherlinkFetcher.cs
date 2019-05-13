@@ -95,13 +95,19 @@ namespace WeatherHub.FrontEnd.Services
             _timeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId.Value);
             if (_timeZone == null)
             {
-                _logger.LogError($"'TimeZoneId' for weather station with Id: {_weatherStation.Id} could not be parsed. For the UK use 'GMT Standard Time '");
-                throw new Exception($"'TimeZoneId' for weather station with Id: {_weatherStation.Id} could not be parsed. For the UK use 'GMT Standard Time '");
+                _logger.LogError($"'TimeZoneId' for weather station with Id: {_weatherStation.Id} could not be parsed. For the UK use 'GMT Standard Time'");
+                throw new Exception($"'TimeZoneId' for weather station with Id: {_weatherStation.Id} could not be parsed. For the UK use 'GMT Standard Time'");
             }
 
             _user = user.Value;
             _password = password.Value;
             _apiToken = apiToken;
+        }
+
+        public async override Task StartAsync()
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            await base.StartAsync();
 
             // We pickup at 1 minute past the period type to give the weather station time to generate the record.
             if (_pickupPeriod == 60)
@@ -118,12 +124,9 @@ namespace WeatherHub.FrontEnd.Services
                     thisPeriod += _pickupPeriod;
                 }
             }
-        }
 
-        public override Task StartAsync()
-        {
-            _cancellationTokenSource = new CancellationTokenSource();
-            return base.StartAsync();
+            // Also do an immidiate pickup to get the current data
+            ScheduleAddHockCollection(TimeSpan.FromTicks(1));
         }
 
         public override Task StopAsync()
@@ -168,7 +171,7 @@ namespace WeatherHub.FrontEnd.Services
             StationReading receivedReading = weatherStationInfo.ToStationReading(_weatherStation);
 
             StationReading latestReading = await _stationReadingRepository.FetchLatestReadingAsync();
-            if (latestReading.When != receivedReading.When)
+            if (latestReading == null || latestReading.When != receivedReading.When)
             {
                 _stationReadingRepository.Create(receivedReading);
             }
