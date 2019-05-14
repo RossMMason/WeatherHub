@@ -12,8 +12,8 @@ namespace WeatherHub.Domain.Repositories
     public interface IStationDayStatisticsRepository
         : IRepository<StationDayStatistics>
     {
-        Task<IEnumerable<StationDayStatistics>> FetchLatestStatistics(DateTime startDate);
+        Task<IEnumerable<StationDayStatistics>> FetchLatestStatistics(Guid weatherStationId, DateTime startDate);
 
-        Task<StationDayStatistics> FetchForDateAsync(DateTime date);
+        Task<StationDayStatistics> FetchForDateAsync(Guid weatherStationId, DateTime date);
     }
 }

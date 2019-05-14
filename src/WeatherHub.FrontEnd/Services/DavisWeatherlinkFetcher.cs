@@ -170,7 +170,7 @@ namespace WeatherHub.FrontEnd.Services
             // Station Reading
             StationReading receivedReading = weatherStationInfo.ToStationReading(_weatherStation);
 
-            StationReading latestReading = await _stationReadingRepository.FetchLatestReadingAsync();
+            StationReading latestReading = await _stationReadingRepository.FetchLatestReadingAsync(_weatherStation.Id);
             if (latestReading == null || latestReading.When != receivedReading.When)
             {
                 _stationReadingRepository.Create(receivedReading);
@@ -178,7 +178,7 @@ namespace WeatherHub.FrontEnd.Services
 
             // Station Day Statistics
             DateTime statisticsDate = TimeZoneInfo.ConvertTimeFromUtc(receivedReading.When, _timeZone).Date;
-            StationDayStatistics latestDayStatistics = await _stationDayStatisticsRepository.FetchForDateAsync(statisticsDate);
+            StationDayStatistics latestDayStatistics = await _stationDayStatisticsRepository.FetchForDateAsync(_weatherStation.Id, statisticsDate);
 
             StationDayStatistics receivedStats = weatherStationInfo.CurrentObservation.ToStationDayStatistics(_weatherStation, statisticsDate);
 

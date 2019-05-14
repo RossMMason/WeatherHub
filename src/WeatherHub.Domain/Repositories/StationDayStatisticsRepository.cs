@@ -22,18 +22,19 @@ namespace WeatherHub.Domain.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<StationDayStatistics> FetchForDateAsync(DateTime date)
+        public async Task<StationDayStatistics> FetchForDateAsync(Guid weatherStationId, DateTime date)
         {
             return await _dbContext
                 .StationDayStatistics
+                .Where(x => x.Station.Id == weatherStationId)
                 .SingleOrDefaultAsync(x => x.Date == date);
         }
 
-        public async Task<IEnumerable<StationDayStatistics>> FetchLatestStatistics(DateTime startDate)
+        public async Task<IEnumerable<StationDayStatistics>> FetchLatestStatistics(Guid weatherStationId, DateTime startDate)
         {
             return await _dbContext
                 .StationDayStatistics
-                .Where(x => x.Date >= startDate)
+                .Where(x => x.Station.Id == weatherStationId && x.Date >= startDate)
                 .OrderBy(x => x.Date)
                 .ToListAsync();
         }

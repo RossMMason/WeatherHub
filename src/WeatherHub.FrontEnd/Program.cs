@@ -21,6 +21,11 @@ namespace WeatherHub.FrontEnd
                     {
                         configuration.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
                         configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+                        if (hostingContext.HostingEnvironment.IsProduction())
+                        {
+                            configuration.AddJsonFile("environmentSettings.Production.json", optional: true, reloadOnChange: true);
+                        }
                     })
                 .UseApplicationInsights()
                 .UseStartup<Startup>();
