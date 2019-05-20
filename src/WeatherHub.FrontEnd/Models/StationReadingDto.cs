@@ -24,9 +24,9 @@ namespace WeatherHub.FrontEnd.Models
 
         public float WindDegrees { get; set; }
 
-        public float WindMph { get; set; }
+        public float WindAvgMph { get; set; }
 
-        public float WindGustMph { get; set; }
+        public float WindAvgGustMph { get; set; }
 
         public float WindChillC { get; set; }
 

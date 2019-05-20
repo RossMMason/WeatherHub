@@ -1,4 +1,4 @@
-﻿// <copyright file="ValuesController.cs" company="Ross Mason">
+﻿// <copyright file="CurrentReadingController.cs" company="Ross Mason">
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 
@@ -33,6 +33,5 @@ namespace WeatherHub.FrontEnd.Controllers
 
             return Ok(reading.ToStationReadingDto());
         }
-
     }
 }

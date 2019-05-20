@@ -21,8 +21,8 @@ namespace WeatherHub.FrontEnd.Models
             dto.When = stationReading.When;
             dto.WindChillC = stationReading.WindChillC;
             dto.WindDegrees = stationReading.WindDegrees;
-            dto.WindGustMph = stationReading.WindGustMph;
-            dto.WindMph = stationReading.WindMph;
+            dto.WindAvgGustMph = stationReading.WindAvgGustMph;
+            dto.WindAvgMph = stationReading.WindAvgMph;
 
             return dto;
         }
