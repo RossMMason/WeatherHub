@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Sample</title>
+    <script src="/widgets/weather-hub-widget.js"></script>
+
+</head>
+<body>
+
+    <div id="TestWeatherWidget" style="margin:50px;">
+
+
+    </div>
+
+    <script>
+        var weatherHubWidget = new WeatherHubWidget(
+            '30D5F2BB-D444-4FDE-9C0A-97AD88C95CE0',
+            'https://dsc-weather.i-clients.co.uk',
+            document.getElementById('TestWeatherWidget'));
+
+    </script>
+</body>
+</html>

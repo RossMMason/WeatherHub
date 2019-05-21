@@ -5,6 +5,7 @@
 namespace WeatherHub.FrontEnd
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
     using Autofac;
@@ -15,6 +16,7 @@ namespace WeatherHub.FrontEnd
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Logging;
     using WeatherHub.Domain;
     using WeatherHub.Domain.Entities;
@@ -59,8 +61,29 @@ namespace WeatherHub.FrontEnd
                 }
             }
 
+            app.UseFileServer(new FileServerOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "widgets")),
+                RequestPath = "/widgets",
+                EnableDirectoryBrowsing = false
+            });
+
             if (env.IsDevelopment())
             {
+                app.UseFileServer(new FileServerOptions
+                {
+                    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "ts")),
+                    RequestPath = "/ts",
+                    EnableDirectoryBrowsing = false
+                });
+
+                app.UseFileServer(new FileServerOptions
+                {
+                    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "sample")),
+                    RequestPath = "/sample",
+                    EnableDirectoryBrowsing = false
+                });
+
                 app.UseDeveloperExceptionPage();
             }
             else

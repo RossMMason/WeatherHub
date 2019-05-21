@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,6 +16,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="GruntFile.js" />
+    <None Remove="ts\TimeSeriesChart.ts" />
+    <None Remove="ts\WeatherHubWidget.ts" />
+    <None Remove="ts\WindRose.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
   </ItemGroup>
 
@@ -23,9 +31,191 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="GruntFile.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Include="node_modules\luxon\package.json" />
+    <Content Include="node_modules\svg.js\bench\runner.html" />
+    <Content Include="node_modules\svg.js\bower.json" />
+    <Content Include="node_modules\svg.js\LICENSE.txt" />
+    <Content Include="node_modules\svg.js\package.json" />
+    <Content Include="node_modules\svg.js\spec\fixtures\fixture.css" />
+    <Content Include="node_modules\svg.js\spec\fixtures\pixel.png" />
+    <Content Include="node_modules\svg.js\spec\lib\jasmine-2.6.0\jasmine.css" />
+    <Content Include="node_modules\svg.js\spec\lib\jasmine-2.6.0\jasmine_favicon.png" />
+    <Content Include="node_modules\svg.js\spec\SpecRunner.html" />
+    <Content Include="node_modules\svg.js\spec\support\jasmine.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="node_modules\luxon\build\amd\luxon.js" />
+    <None Include="node_modules\luxon\build\amd\luxon.js.map" />
+    <None Include="node_modules\luxon\build\cjs-browser\luxon.js" />
+    <None Include="node_modules\luxon\build\cjs-browser\luxon.js.map" />
+    <None Include="node_modules\luxon\build\global\luxon.js" />
+    <None Include="node_modules\luxon\build\global\luxon.js.map" />
+    <None Include="node_modules\luxon\build\global\luxon.min.js" />
+    <None Include="node_modules\luxon\build\global\luxon.min.js.map" />
+    <None Include="node_modules\luxon\build\node\luxon.js" />
+    <None Include="node_modules\luxon\build\node\luxon.js.map" />
+    <None Include="node_modules\luxon\build\readme.md" />
+    <None Include="node_modules\luxon\changelog.md" />
+    <None Include="node_modules\luxon\license.md" />
+    <None Include="node_modules\luxon\README.md" />
+    <None Include="node_modules\luxon\src\datetime.js" />
+    <None Include="node_modules\luxon\src\duration.js" />
+    <None Include="node_modules\luxon\src\errors.js" />
+    <None Include="node_modules\luxon\src\impl\conversions.js" />
+    <None Include="node_modules\luxon\src\impl\diff.js" />
+    <None Include="node_modules\luxon\src\impl\digits.js" />
+    <None Include="node_modules\luxon\src\impl\english.js" />
+    <None Include="node_modules\luxon\src\impl\formats.js" />
+    <None Include="node_modules\luxon\src\impl\formatter.js" />
+    <None Include="node_modules\luxon\src\impl\invalid.js" />
+    <None Include="node_modules\luxon\src\impl\locale.js" />
+    <None Include="node_modules\luxon\src\impl\regexParser.js" />
+    <None Include="node_modules\luxon\src\impl\tokenParser.js" />
+    <None Include="node_modules\luxon\src\impl\util.js" />
+    <None Include="node_modules\luxon\src\impl\zoneUtil.js" />
+    <None Include="node_modules\luxon\src\info.js" />
+    <None Include="node_modules\luxon\src\interval.js" />
+    <None Include="node_modules\luxon\src\luxon.js" />
+    <None Include="node_modules\luxon\src\luxonFilled.js" />
+    <None Include="node_modules\luxon\src\settings.js" />
+    <None Include="node_modules\luxon\src\zone.js" />
+    <None Include="node_modules\luxon\src\zones\fixedOffsetZone.js" />
+    <None Include="node_modules\luxon\src\zones\IANAZone.js" />
+    <None Include="node_modules\luxon\src\zones\invalidZone.js" />
+    <None Include="node_modules\luxon\src\zones\localZone.js" />
+    <None Include="node_modules\svg.js\.config\karma.conf.js" />
+    <None Include="node_modules\svg.js\.config\karma.quick.js" />
+    <None Include="node_modules\svg.js\.config\pretest.js" />
+    <None Include="node_modules\svg.js\.github\CONTRIBUTING.md" />
+    <None Include="node_modules\svg.js\.github\ISSUE_TEMPLATE\bug-report.md" />
+    <None Include="node_modules\svg.js\.github\ISSUE_TEMPLATE\feature-request.md" />
+    <None Include="node_modules\svg.js\.github\ISSUE_TEMPLATE\other.md" />
+    <None Include="node_modules\svg.js\.travis.yml" />
+    <None Include="node_modules\svg.js\bench\svg.bench.js" />
+    <None Include="node_modules\svg.js\bench\tests\10000-circles.js" />
+    <None Include="node_modules\svg.js\bench\tests\10000-each.js" />
+    <None Include="node_modules\svg.js\bench\tests\10000-pathArrays.js" />
+    <None Include="node_modules\svg.js\bench\tests\10000-paths.js" />
+    <None Include="node_modules\svg.js\bench\tests\10000-polysPointRead.js" />
+    <None Include="node_modules\svg.js\bench\tests\10000-rects.js" />
+    <None Include="node_modules\svg.js\CHANGELOG.md" />
+    <None Include="node_modules\svg.js\dist\svg.js" />
+    <None Include="node_modules\svg.js\dist\svg.min.js" />
+    <None Include="node_modules\svg.js\gulpfile.js" />
+    <None Include="node_modules\svg.js\README.md" />
+    <None Include="node_modules\svg.js\spec\fixtures\fixture.svg" />
+    <None Include="node_modules\svg.js\spec\lib\jasmine-2.6.0\boot.js" />
+    <None Include="node_modules\svg.js\spec\lib\jasmine-2.6.0\console.js" />
+    <None Include="node_modules\svg.js\spec\lib\jasmine-2.6.0\jasmine-html.js" />
+    <None Include="node_modules\svg.js\spec\lib\jasmine-2.6.0\jasmine.js" />
+    <None Include="node_modules\svg.js\spec\spec\adopter.js" />
+    <None Include="node_modules\svg.js\spec\spec\arrange.js" />
+    <None Include="node_modules\svg.js\spec\spec\array.js" />
+    <None Include="node_modules\svg.js\spec\spec\bare.js" />
+    <None Include="node_modules\svg.js\spec\spec\boxes.js" />
+    <None Include="node_modules\svg.js\spec\spec\circle.js" />
+    <None Include="node_modules\svg.js\spec\spec\clip.js" />
+    <None Include="node_modules\svg.js\spec\spec\color.js" />
+    <None Include="node_modules\svg.js\spec\spec\container.js" />
+    <None Include="node_modules\svg.js\spec\spec\defs.js" />
+    <None Include="node_modules\svg.js\spec\spec\doc.js" />
+    <None Include="node_modules\svg.js\spec\spec\easing.js" />
+    <None Include="node_modules\svg.js\spec\spec\element.js" />
+    <None Include="node_modules\svg.js\spec\spec\ellipse.js" />
+    <None Include="node_modules\svg.js\spec\spec\event.js" />
+    <None Include="node_modules\svg.js\spec\spec\fx.js" />
+    <None Include="node_modules\svg.js\spec\spec\gradient.js" />
+    <None Include="node_modules\svg.js\spec\spec\group.js" />
+    <None Include="node_modules\svg.js\spec\spec\helper.js" />
+    <None Include="node_modules\svg.js\spec\spec\hyperlink.js" />
+    <None Include="node_modules\svg.js\spec\spec\image.js" />
+    <None Include="node_modules\svg.js\spec\spec\line.js" />
+    <None Include="node_modules\svg.js\spec\spec\marker.js" />
+    <None Include="node_modules\svg.js\spec\spec\mask.js" />
+    <None Include="node_modules\svg.js\spec\spec\matrix.js" />
+    <None Include="node_modules\svg.js\spec\spec\memory.js" />
+    <None Include="node_modules\svg.js\spec\spec\nested.js" />
+    <None Include="node_modules\svg.js\spec\spec\number.js" />
+    <None Include="node_modules\svg.js\spec\spec\path.js" />
+    <None Include="node_modules\svg.js\spec\spec\pattern.js" />
+    <None Include="node_modules\svg.js\spec\spec\point.js" />
+    <None Include="node_modules\svg.js\spec\spec\polygon.js" />
+    <None Include="node_modules\svg.js\spec\spec\polyline.js" />
+    <None Include="node_modules\svg.js\spec\spec\rect.js" />
+    <None Include="node_modules\svg.js\spec\spec\regex.js" />
+    <None Include="node_modules\svg.js\spec\spec\selector.js" />
+    <None Include="node_modules\svg.js\spec\spec\set.js" />
+    <None Include="node_modules\svg.js\spec\spec\sugar.js" />
+    <None Include="node_modules\svg.js\spec\spec\svg.js" />
+    <None Include="node_modules\svg.js\spec\spec\symbol.js" />
+    <None Include="node_modules\svg.js\spec\spec\text.js" />
+    <None Include="node_modules\svg.js\spec\spec\textpath.js" />
+    <None Include="node_modules\svg.js\spec\spec\transformations.js" />
+    <None Include="node_modules\svg.js\spec\spec\tspan.js" />
+    <None Include="node_modules\svg.js\spec\spec\use.js" />
+    <None Include="node_modules\svg.js\spec\spec\utils.js" />
+    <None Include="node_modules\svg.js\spec\spec\viewbox.js" />
+    <None Include="node_modules\svg.js\src\arrange.js" />
+    <None Include="node_modules\svg.js\src\array.js" />
+    <None Include="node_modules\svg.js\src\attr.js" />
+    <None Include="node_modules\svg.js\src\bare.js" />
+    <None Include="node_modules\svg.js\src\boxes.js" />
+    <None Include="node_modules\svg.js\src\clip.js" />
+    <None Include="node_modules\svg.js\src\color.js" />
+    <None Include="node_modules\svg.js\src\container.js" />
+    <None Include="node_modules\svg.js\src\data.js" />
+    <None Include="node_modules\svg.js\src\default.js" />
+    <None Include="node_modules\svg.js\src\defs.js" />
+    <None Include="node_modules\svg.js\src\doc.js" />
+    <None Include="node_modules\svg.js\src\element.js" />
+    <None Include="node_modules\svg.js\src\ellipse.js" />
+    <None Include="node_modules\svg.js\src\event.js" />
+    <None Include="node_modules\svg.js\src\fx.js" />
+    <None Include="node_modules\svg.js\src\gradient.js" />
+    <None Include="node_modules\svg.js\src\group.js" />
+    <None Include="node_modules\svg.js\src\helpers.js" />
+    <None Include="node_modules\svg.js\src\hyperlink.js" />
+    <None Include="node_modules\svg.js\src\image.js" />
+    <None Include="node_modules\svg.js\src\line.js" />
+    <None Include="node_modules\svg.js\src\marker.js" />
+    <None Include="node_modules\svg.js\src\mask.js" />
+    <None Include="node_modules\svg.js\src\matrix.js" />
+    <None Include="node_modules\svg.js\src\memory.js" />
+    <None Include="node_modules\svg.js\src\nested.js" />
+    <None Include="node_modules\svg.js\src\number.js" />
+    <None Include="node_modules\svg.js\src\parent.js" />
+    <None Include="node_modules\svg.js\src\path.js" />
+    <None Include="node_modules\svg.js\src\patharray.js" />
+    <None Include="node_modules\svg.js\src\pattern.js" />
+    <None Include="node_modules\svg.js\src\point.js" />
+    <None Include="node_modules\svg.js\src\pointarray.js" />
+    <None Include="node_modules\svg.js\src\pointed.js" />
+    <None Include="node_modules\svg.js\src\poly.js" />
+    <None Include="node_modules\svg.js\src\polyfill.js" />
+    <None Include="node_modules\svg.js\src\rect.js" />
+    <None Include="node_modules\svg.js\src\regex.js" />
+    <None Include="node_modules\svg.js\src\selector.js" />
+    <None Include="node_modules\svg.js\src\set.js" />
+    <None Include="node_modules\svg.js\src\shape.js" />
+    <None Include="node_modules\svg.js\src\style.js" />
+    <None Include="node_modules\svg.js\src\sugar.js" />
+    <None Include="node_modules\svg.js\src\svg.js" />
+    <None Include="node_modules\svg.js\src\symbol.js" />
+    <None Include="node_modules\svg.js\src\text.js" />
+    <None Include="node_modules\svg.js\src\textpath.js" />
+    <None Include="node_modules\svg.js\src\transform.js" />
+    <None Include="node_modules\svg.js\src\umd.js" />
+    <None Include="node_modules\svg.js\src\ungroup.js" />
+    <None Include="node_modules\svg.js\src\use.js" />
+    <None Include="node_modules\svg.js\src\utilities.js" />
+    <None Include="node_modules\svg.js\src\viewbox.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +234,25 @@
   <ItemGroup>
     <ProjectReference Include="..\WeatherHub.Domain.Migrations\WeatherHub.Domain.Migrations.csproj" />
     <ProjectReference Include="..\WeatherHub.Domain\WeatherHub.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="widgets\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="node_modules\svg.js\svg.js.d.ts" />
+    <TypeScriptCompile Include="ts\TimeSeriesChart.ts" />
+    <TypeScriptCompile Include="ts\WeatherHubWidget.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ts\WindRose.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="widgets\weather-hub-plugin.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
