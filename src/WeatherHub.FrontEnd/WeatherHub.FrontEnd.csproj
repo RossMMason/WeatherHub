@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -16,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="GruntFile.js" />
     <None Remove="ts\TimeSeriesChart.ts" />
     <None Remove="ts\WeatherHubWidget.ts" />
     <None Remove="ts\WindRose.ts" />
@@ -31,9 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="GruntFile.js">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Content>
     <Content Include="node_modules\luxon\package.json" />
     <Content Include="node_modules\svg.js\bench\runner.html" />
     <Content Include="node_modules\svg.js\bower.json" />

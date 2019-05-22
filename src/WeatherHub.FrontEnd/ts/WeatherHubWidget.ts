@@ -1,10 +1,10 @@
-﻿// import TimeSeriesChart, { SeriesInfo } from './TimeSeriesChart';
-// import WindRose from './WindRose';
+﻿import TimeSeriesChart, { SeriesInfo } from './TimeSeriesChart';
+import WindRose from './WindRose';
 
-class WeatherHubWidget {
+export default class WeatherHubWidget {
      
     private weatherStationId: string; 
-    private weatherHubServer: string
+    private weatherHubServer: string  
     private widgetContainer: HTMLElement;    
     
 
@@ -15,7 +15,7 @@ class WeatherHubWidget {
 
     private avgWindColor = "#27AAE1";
 
-    private gustColor = "#F03153"
+    private gustColor = "#F03153" 
 
     private windRose: WindRose;
 
@@ -54,12 +54,12 @@ class WeatherHubWidget {
     }
 
     private positionSubWidgets() {
-        this.windRoseContainer.style.width = "600px";
-        this.windRoseContainer.style.height = "600px";
+        this.windRoseContainer.style.width = "400px";
+        this.windRoseContainer.style.height = "400px";
 
-        this.windStrengthContainer.style.width = "900px"
+        this.windStrengthContainer.style.width = "700px"
         this.windStrengthContainer.style.height = "300px"
-        this.windStrengthContainer.style.left = "610px";
+        this.windStrengthContainer.style.left = "440px";
     }
 
     private initialiseSubWidgets() {

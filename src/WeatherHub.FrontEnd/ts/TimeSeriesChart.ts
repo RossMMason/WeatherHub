@@ -5,21 +5,21 @@
     differenceInMinutes,
     format,
     isPast,
-    startOfMinute,
+    startOfMinute,
+    getHours,
     getMinutes
 } from 'date-fns';
 
 const svgns = 'http://www.w3.org/2000/svg';
 
-class TimeSeriesChart {
+export default class TimeSeriesChart {
 
     private showHours: number;
-    //private chartEndDate: Date;
     private svg: SVGSVGElement;
     private container: HTMLElement;
 
-    private viewBoxHeight: 300; 
-    private viewBoxWidth: 900;
+    private viewBoxHeight =  300; 
+    private viewBoxWidth = 900;
     private xPerMinute: number;
     private chartTotalMinutes: number;
 
@@ -30,12 +30,15 @@ class TimeSeriesChart {
     private minorTickInterval: number;
     private timeTickInterval: number;
 
-    private dateLabelHeight = 10;
-    private timeLabelHeight = 10;
+    private dateLabelHeight = 14;
+    private timeLabelHeight = 14;
     private minorTickHeight = 10;
-    minorTickY1: number;
-    minorTickY2: number;
-    tickColor: string;
+    private minorTickY1: number;
+    private minorTickY2: number;
+    private timeCentreY: number;
+    private dateCentreY: number;
+    private tickColor: string;
+    private labelColor: string;
 
 
     constructor(
@@ -48,10 +51,11 @@ class TimeSeriesChart {
         this.series = series;
         this.numSeries = series.length;
         this.tickColor = tickColor;
+        this.labelColor = tickColor;
         this.calculateKeyFigures();
-
-        // this.chartEndDate = addMinutes(startOfMinute(new Date()), 1);
-        // this.updateDisplay();
+        this.render();
+        this.createMissingIntervals();
+        this.scheduleNextUpdate();
     }
 
     private calculateKeyFigures() {
@@ -59,10 +63,10 @@ class TimeSeriesChart {
         this.chartTotalMinutes = this.showHours * 60;
         this.zeroXDate = addHours(addMinutes(startOfMinute(new Date()), 1), -this.showHours);
 
-        // At least 5 units per tick.
+        // At least 10 units per tick.
         this.minorTickInterval = 0;
-        while (this.xPerMinute * this.minorTickInterval < 5) {
-            this.minorTickInterval += 5
+        while (this.xPerMinute * this.minorTickInterval < 10) {
+            this.minorTickInterval += 10
         }
 
         // Atleast 100 pixels per time tick.
@@ -73,7 +77,8 @@ class TimeSeriesChart {
 
         this.minorTickY1 = this.viewBoxHeight - this.dateLabelHeight - this.timeLabelHeight - this.minorTickHeight;
         this.minorTickY2 = this.minorTickY1 + this.minorTickHeight;
-
+        this.timeCentreY = this.viewBoxHeight - this.dateLabelHeight - (this.timeLabelHeight / 2);
+        this.dateCentreY = this.viewBoxHeight - (this.dateLabelHeight / 2);
     }
 
     private createMissingIntervals() {
@@ -96,13 +101,14 @@ class TimeSeriesChart {
                 }
 
                 this.chartIntervals = [thisInterval, ...this.chartIntervals];
+                this.drawTickAndLabel(thisInterval.when);
 
                 currentDate = addMinutes(currentDate, -1);
             }
         }
 
         // Populate intervals going forward
-        let currentDate = addMinutes(this.chartIntervals[this.chartIntervals.length].when, 1);
+        let currentDate = addMinutes(this.chartIntervals[this.chartIntervals.length-1].when, 1);
         while (currentEndDate >= currentDate) {
 
             let thisInterval: ChartInterval = {
@@ -111,6 +117,7 @@ class TimeSeriesChart {
             }
 
             this.chartIntervals.push(thisInterval);
+            this.drawTickAndLabel(thisInterval.when);
 
             currentDate = addMinutes(currentDate, 1);
         }
@@ -121,23 +128,41 @@ class TimeSeriesChart {
     }
 
     private drawTickAndLabel(date: Date) {
-
         let x = this.getXPosForDate(date);
 
+        if (getHours(date) === 0 && getMinutes(date) === 0) {
+
+            let dateLabel = document.createElementNS(svgns, 'text') as SVGElement;
+            dateLabel.setAttribute('x', x.toString());
+            dateLabel.setAttribute('y', this.dateCentreY.toString());
+            dateLabel.setAttribute('text-anchor', 'middle');
+            dateLabel.setAttribute('dominant-baseline', 'middle');
+            dateLabel.innerHTML = format(date, 'Do MMM YY')
+            dateLabel.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + ';');
+            this.svg.appendChild(dateLabel);
+        }
+
+        if (getMinutes(date) % this.timeTickInterval === 0) {
+
+            let timeLabel = document.createElementNS(svgns, 'text') as SVGElement;
+            timeLabel.setAttribute('x', x.toString());
+            timeLabel.setAttribute('y', this.timeCentreY.toString());
+            timeLabel.setAttribute('text-anchor', 'middle');
+            timeLabel.setAttribute('dominant-baseline', 'middle');
+            timeLabel.innerHTML = format(date, 'HH')
+            timeLabel.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + ';');
+            this.svg.appendChild(timeLabel);
+        }
+
         if (getMinutes(date) % this.minorTickInterval === 0) {
-
             let tick = document.createElementNS(svgns, 'line') as SVGLineElement;
-
             tick.setAttribute('x1', x.toString());
             tick.setAttribute('y1', this.minorTickY1.toString());
             tick.setAttribute('x2', x.toString());
             tick.setAttribute('y2', this.minorTickY2.toString());
-            tick.setAttribute('style', 'stroke:' + this.tickColor + ';stroke-width:1');
+            tick.setAttribute('style', 'stroke:' + this.tickColor + ';stroke-width:1'); 
             this.svg.appendChild(tick);
-
         }
-
-
     }
 
     private render() {
@@ -148,19 +173,36 @@ class TimeSeriesChart {
         this.svg.style.width = '100%';
         this.svg.style.height = 'auto';
         this.container.appendChild(this.svg);
+
+        let xAxis = document.createElementNS(svgns, 'line') as SVGLineElement;
+
+        xAxis.setAttribute('x1', '-99999');
+        xAxis.setAttribute('x2', '99999');
+        xAxis.setAttribute('y1', this.minorTickY1.toString());
+        xAxis.setAttribute('y2', this.minorTickY1.toString());
+        xAxis.setAttribute('style', 'stroke:' + this.tickColor + ';stroke-width:2'); 
+        this.svg.appendChild(xAxis);
+
     }
 
-    /*private scheduleNextUpdate() {
-        if (isPast(this.chartEndDate)) {
-            this.chartEndDate = addMinutes(startOfMinute(new Date()), 1);
-            this.updateDisplay();
-            return;
-        }
+    private scheduleNextUpdate() {
+        let currentEndDate = addMinutes(startOfMinute(new Date()), 1);
+        let timeUntilUpdate = differenceInMilliseconds(currentEndDate, new Date());
+        setTimeout(this.updateDisplay.bind(this), timeUntilUpdate);
+    }
 
-        let timeUntilUpdate = differenceInMilliseconds(this.chartEndDate, new Date());
+    private updateDisplay() {
+        this.createMissingIntervals();
+        this.moveToCurrentTime();
+        this.scheduleNextUpdate();
+    }
 
-        setTimeout(this.updateDisplay, timeUntilUpdate);
-    }*/
+    private moveToCurrentTime() {
+        let currentEndDate = addMinutes(startOfMinute(new Date()), 1);
+        let currentStartDate = addHours(currentEndDate, -this.showHours); 
+        let xOffset = differenceInMinutes(currentStartDate, this.zeroXDate) * this.xPerMinute;
+        this.svg.setAttributeNS(null, 'viewBox', xOffset.toString() + ' 0 ' + this.viewBoxWidth + ' ' + this.viewBoxHeight);
+    }
 }
 
 type ChartInterval = {
@@ -173,7 +215,7 @@ type DataPoint = {
     element: SVGElement;
 }
 
-type SeriesInfo = {
+export type SeriesInfo = {
     color: string; 
     label: string;
 }
