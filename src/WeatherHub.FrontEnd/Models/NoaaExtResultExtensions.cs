@@ -64,9 +64,14 @@ namespace WeatherHub.FrontEnd.Models
                     stationReading.RainCmPerHour = rainRateInPerHour.ToCmFromInches();
                 }
 
+                if (float.TryParse(noaaExtResult.CurrentObservation.WindTenMinAvgMph, out float windAvgMph))
+                {
+                    stationReading.WindAvgMph = windAvgMph;
+                }
+
                 if (float.TryParse(noaaExtResult.CurrentObservation.WindTenMinGustMph, out float windGustMph))
                 {
-                    stationReading.WindGustMph = windGustMph;
+                    stationReading.WindAvgGustMph = windGustMph;
                 }
             }
 
