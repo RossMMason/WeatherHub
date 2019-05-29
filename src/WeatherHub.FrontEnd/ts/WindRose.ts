@@ -1,4 +1,5 @@
 ﻿const svgns = 'http://www.w3.org/2000/svg';
+import { debounce } from 'ts-debounce';
 
 export default class WindRose {
     private container: HTMLDivElement;
@@ -15,6 +16,9 @@ export default class WindRose {
     private arrowColor: string;
     private labelColor: string;
 
+    private debouncedMoveToPosition: (degrees: number) => void;
+
+    private mostRecentReading: Date | undefined = undefined;
 
     constructor(
         container: HTMLDivElement,
@@ -22,6 +26,8 @@ export default class WindRose {
         arrowColor: string, 
         labelColor: string,
     ) {
+
+        this.debouncedMoveToPosition = debounce(this.moveToPosition, 100);
         this.container = container;
         this.tickColor = tickColor;
         this.arrowColor = arrowColor;
@@ -29,12 +35,17 @@ export default class WindRose {
 
         this.setKeyPoints();
         this.render();
-
-        this.moveToPosition(185);
-
     }
 
-    public moveToPosition(degrees: number) {
+    public displayNewDataPoint(when: Date, windDegrees: number) {
+
+        if (!this.mostRecentReading || this.mostRecentReading < when) {
+            this.debouncedMoveToPosition(windDegrees);
+            this.mostRecentReading = when;
+        }
+    }
+
+    private moveToPosition(degrees: number) {
         if (this.arrowAnimation) {
 
             this.arrowAnimation.setAttribute('type', 'rotate');
@@ -138,7 +149,7 @@ export default class WindRose {
         this.arrowAnimation.setAttribute('type', 'rotate');
         this.arrowAnimation.setAttribute('from', this.currentPos.toString() + ' ' + this.centre.toString() + ' ' + this.centre.toString());
         this.arrowAnimation.setAttribute('to', this.currentPos.toString() + ' ' + this.centre.toString() + ' ' + this.centre.toString());
-        this.arrowAnimation.setAttribute('dur', '1.2s');
+        this.arrowAnimation.setAttribute('dur', '0.5s');
         this.arrowAnimation.setAttribute('repeatCount', '1');
         this.arrow.appendChild(this.arrowAnimation);
 

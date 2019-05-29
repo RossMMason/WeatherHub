@@ -12,7 +12,7 @@ namespace WeatherHub.Domain.Repositories
     public interface IStationReadingRepository
         : IRepository<StationReading>
     {
-        Task<IEnumerable<StationReading>> FetchLatestReadingsAsync(Guid weatherStationId, DateTime startDateTime);
+        Task<IEnumerable<StationReading>> FetchReadingsAsync(Guid weatherStationId, DateTime startDateTime, DateTime endDateTime);
 
         Task<StationReading> FetchLatestReadingAsync(Guid weatherStationId);
     }

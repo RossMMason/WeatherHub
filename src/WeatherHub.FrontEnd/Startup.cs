@@ -26,6 +26,9 @@ namespace WeatherHub.FrontEnd
 
     public class Startup
     {
+
+        private const string WeatherHubCorsPolicyName = "WeatherHubCorsPolicy";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -36,7 +39,20 @@ namespace WeatherHub.FrontEnd
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(
+                    WeatherHubCorsPolicyName,
+                    builder =>
+                    {
+                        builder
+                            .AllowAnyOrigin()
+                            .WithMethods(new string[] { "GET" });
+                    });
+            });
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsightsKey"]);
 
             services.AddHostedService<WeatherCollector>();
@@ -48,6 +64,8 @@ namespace WeatherHub.FrontEnd
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, WeatherHubDbContext weatherHubDbContext)
         {
+            var contentRoot = env.ContentRootPath;
+
             using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 try
@@ -63,8 +81,15 @@ namespace WeatherHub.FrontEnd
 
             app.UseFileServer(new FileServerOptions
             {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "widgets")),
+                FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "widgets")),
                 RequestPath = "/widgets",
+                EnableDirectoryBrowsing = false
+            });
+
+            app.UseFileServer(new FileServerOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "sample")),
+                RequestPath = "/sample",
                 EnableDirectoryBrowsing = false
             });
 
@@ -72,15 +97,8 @@ namespace WeatherHub.FrontEnd
             {
                 app.UseFileServer(new FileServerOptions
                 {
-                    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "ts")),
+                    FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "ts")),
                     RequestPath = "/ts",
-                    EnableDirectoryBrowsing = false
-                });
-
-                app.UseFileServer(new FileServerOptions
-                {
-                    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "sample")),
-                    RequestPath = "/sample",
                     EnableDirectoryBrowsing = false
                 });
 
@@ -93,6 +111,7 @@ namespace WeatherHub.FrontEnd
             }
 
             app.UseHttpsRedirection();
+            app.UseCors(WeatherHubCorsPolicyName);
             app.UseMvc();
 
             loggerFactory.AddApplicationInsights(app.ApplicationServices, LogLevel.Warning);
