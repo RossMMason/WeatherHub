@@ -26,6 +26,8 @@ export default class WeatherHubWidget {
     private windDirectionChart: TimeSeriesChart;
     private windDirectionContainer: HTMLDivElement;
     private stationReadingLookup: DataLookup<StationReading>;
+    private windStrengthContainer: HTMLDivElement;
+    private windStrengthChart: TimeSeriesChart;
 
     constructor(
         weatherHubServer: string,
@@ -47,6 +49,7 @@ export default class WeatherHubWidget {
     private addSubWidgets() {
         this.innerContainer = document.createElement('div');
         this.innerContainer.style.position = 'relative';
+        this.innerContainer.style.userSelect = 'none';
 
 
         this.windRoseContainer = document.createElement("div") as HTMLDivElement;
@@ -56,8 +59,11 @@ export default class WeatherHubWidget {
         this.windDirectionContainer = document.createElement("div") as HTMLDivElement;
         this.windDirectionContainer.style.position = 'absolute';
         this.innerContainer.appendChild(this.windDirectionContainer);
-        
 
+        this.windStrengthContainer = document.createElement("div") as HTMLDivElement;
+        this.windStrengthContainer.style.position = 'absolute';
+        this.innerContainer.appendChild(this.windStrengthContainer);
+        
         this.widgetContainer.appendChild(this.innerContainer);
     }
 
@@ -66,23 +72,17 @@ export default class WeatherHubWidget {
         this.windRoseContainer.style.height = "400px";
 
         this.windDirectionContainer.style.width = "700px"
-        this.windDirectionContainer.style.height = "300px"
-        this.windDirectionContainer.style.left = "440px";
+        this.windDirectionContainer.style.height = "250px"
+        this.windDirectionContainer.style.left = "410px";
+
+        this.windStrengthContainer.style.width = "700px"
+        this.windStrengthContainer.style.height = "250px"
+        this.windStrengthContainer.style.left = "410px";
+        this.windStrengthContainer.style.top = "260px";
     }
 
     private initialiseSubWidgets() {
         this.windRose = new WindRose(this.windRoseContainer, this.labelColor, this.gustColor, this.labelColor);
-
-        let windStrengthSeries: SeriesInfo[] = [
-            {
-                color: this.avgWindColor,
-                label: '10 Min Avg Wind (mph)'
-            },
-            {
-                color: this.gustColor,
-                label: '10 Min Max Gust (mph)'
-            },
-        ]
 
         let windDirectionSeries: SeriesInfo[] = [
             {
@@ -102,6 +102,31 @@ export default class WeatherHubWidget {
         ];
 
         this.windDirectionChart = new TimeSeriesChart(this.windDirectionContainer, 24, windDirectionSeries, this.labelColor, false, windDirectionYAxisLabels);
+
+        let windStrengthSeries: SeriesInfo[] = [
+            {
+                color: this.avgWindColor,
+                label: '10 Min Avg Wind (mph)'
+            },
+            {
+                color: this.gustColor,
+                label: '10 Min Max Gust (mph)'
+            },
+        ]
+
+        let windStrengthYAxisLabels: YAxisLabel[] = [
+            { y: 5, label: '5' },
+            { y: 10, label: '10' },
+            { y: 15, label: '15' },
+            { y: 20, label: '20' },
+            { y: 25, label: '25' },
+            { y: 30, label: '30' },
+            { y: 35, label: '35' },
+            { y: 40, label: '40' },
+        ];
+
+
+        this.windStrengthChart = new TimeSeriesChart(this.windStrengthContainer, 24, windStrengthSeries, this.labelColor, false, windStrengthYAxisLabels);
     }
 
     private loadInitialData() {
@@ -151,14 +176,21 @@ export default class WeatherHubWidget {
 
     private broadcastReading(stationReading: StationReading) {
 
-        this.windRose.displayNewDataPoint(stationReading.when, stationReading.windDegrees);
-
         let directionDataPoint: DataPoint = {
             when: stationReading.when,
             seriesData: [stationReading.windDegrees]
         };
 
         this.windDirectionChart.addDataPoint(directionDataPoint);
+
+        let strengthDataPoint: DataPoint = {
+            when: stationReading.when,
+            seriesData: [stationReading.windAvgMph, stationReading.windAvgGustMph]
+        }
+
+        this.windStrengthChart.addDataPoint(strengthDataPoint);
+
+        this.windRose.displayNewDataPoint(stationReading.when, stationReading.windDegrees);
     }
 }
 

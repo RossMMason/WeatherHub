@@ -22,8 +22,8 @@ export default class TimeSeriesChart {
     private yAxisSvg: SVGSVGElement;
     private container: HTMLElement;
 
-    private viewBoxHeight =  300; 
-    private viewBoxWidth = 900;
+    private viewBoxHeight = 250; 
+    private viewBoxWidth = 700;
     private xPerMinute: number;
     private chartTotalMinutes: number;
 
@@ -37,9 +37,9 @@ export default class TimeSeriesChart {
     private dateLabelHeight = 14;
     private timeLabelHeight = 14;
     private xAxisTickHeight = 10;
-    private yAxisLabelWidth = 15;
+    private yAxisLabelWidth = 18;
     private yAxisTickWidth = 5;
-    private yPaddingTop = 5;
+    private yPaddingTop = 10;
     private minorXTickY1: number;
     private minorXTickY2: number;
     private timeCentreY: number;
@@ -58,7 +58,7 @@ export default class TimeSeriesChart {
 
     private yZeroPosition: number;
     private yPixelsPerUnit: number;
-    yAxisLabelRightPos: number;
+    private yAxisLabelRightPos: number;
 
 
     constructor(
@@ -115,25 +115,25 @@ export default class TimeSeriesChart {
 
         let gPoints = dataPoint.seriesData.map(function (seriesDataPoint, seriesIndex) {
 
-            let y = timeSeriesChart.getYPosForValue(seriesDataPoint);
+            let y = timeSeriesChart.getYUnitsForValue(seriesDataPoint);
 
             let gPoint = document.createElementNS(svgns, 'circle') as SVGCircleElement;
             gPoint.setAttribute('cx', x.toString());
             gPoint.setAttribute('cy', timeSeriesChart.yZeroPosition.toString());
-            gPoint.setAttribute('r', '4');
+            gPoint.setAttribute('r', '2');
             gPoint.setAttribute('style', 'stroke:' + timeSeriesChart.series[seriesIndex].color + ';stroke-width:2; fill: none;');
 
-            let gPointAnimation = document.createElementNS(svgns, 'animate') as SVGElement;
-            gPointAnimation.setAttribute('attributeName', 'cy');
+            let gPointAnimation  = document.createElementNS(svgns, 'animateTransform') as SVGElement;
+            gPointAnimation.setAttribute('attributeName', 'transform');
             gPointAnimation.setAttribute('attributeType', 'XML');
-            gPointAnimation.setAttribute('from', timeSeriesChart.yZeroPosition.toString());
-            gPointAnimation.setAttribute('to', y.toString());
-            gPointAnimation.setAttribute('begin', '0');
-            gPointAnimation.setAttribute('dur', '0.6s');
+            gPointAnimation.setAttribute('type', 'translate');
+            gPointAnimation.setAttribute('from', '0,0');
+            gPointAnimation.setAttribute('to', '0,' + -y.toString());
+            gPointAnimation.setAttribute('dur', '0.5s');
             gPointAnimation.setAttribute('repeatCount', '1');
-            gPoint.append(gPointAnimation);
+            gPoint.appendChild(gPointAnimation);
 
-            gPoint.setAttribute('cy', y.toString());
+            gPoint.setAttribute('transform', 'translate(' + 0 + ', ' + -y.toString() + ')');
 
             timeSeriesChart.chartSvg.appendChild(gPoint);
 
@@ -234,7 +234,7 @@ export default class TimeSeriesChart {
             dateLabel.setAttribute('text-anchor', 'middle');
             dateLabel.setAttribute('dominant-baseline', 'middle');
             dateLabel.innerHTML = format(date, 'Do MMM YY')
-            dateLabel.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + ';');
+            dateLabel.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + ';font-weight: bold');
             this.chartSvg.appendChild(dateLabel);
         }
 
@@ -246,7 +246,7 @@ export default class TimeSeriesChart {
             timeLabel.setAttribute('text-anchor', 'middle');
             timeLabel.setAttribute('dominant-baseline', 'middle');
             timeLabel.innerHTML = format(date, 'HH')
-            timeLabel.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + ';');
+            timeLabel.setAttribute('style', 'font: 11px sans-serif; fill: ' + this.labelColor + '; font-weight: bold');
             this.chartSvg.appendChild(timeLabel);
         }
 
@@ -297,13 +297,22 @@ export default class TimeSeriesChart {
             this.yAxisSvg.appendChild(tick);
             this.yAxisSvgTicks.push(tick);
 
+            let fullScreenTick = document.createElementNS(svgns, 'line') as SVGLineElement;
+            fullScreenTick.setAttribute('x1', '-9999');
+            fullScreenTick.setAttribute('x2', '9999');
+            fullScreenTick.setAttribute('y1', yPos.toString());
+            fullScreenTick.setAttribute('y2', yPos.toString());
+            fullScreenTick.setAttribute('style', 'stroke:' + '#aaaaaa' + ';stroke-width:1');
+            this.chartSvg.appendChild(fullScreenTick);
+            this.yAxisSvgTicks.push(fullScreenTick);
+
             let label = document.createElementNS(svgns, 'text') as SVGElement;
             label.setAttribute('x', this.yAxisLabelRightPos.toString());
             label.setAttribute('y', yPos.toString());
             label.setAttribute('text-anchor', 'end');
             label.setAttribute('dominant-baseline', 'middle');
             label.innerHTML = this.yAxisLabels[i].label;
-            label.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + ';');
+            label.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + '; font-weight:bold');
             this.yAxisSvg.appendChild(label);
             this.yAxisSvgLabels.push(label);
         }
@@ -311,6 +320,10 @@ export default class TimeSeriesChart {
 
     private getYPosForValue(value: number) {
         return this.yZeroPosition - (value * this.yPixelsPerUnit);
+    }
+
+    private getYUnitsForValue(value: number) {
+        return (value * this.yPixelsPerUnit);
     }
 
     private drawYAxisBasedOnInViewData() {
@@ -328,6 +341,14 @@ export default class TimeSeriesChart {
         this.yAxisSvg.style.height = 'auto';
         this.yAxisSvg.style.zIndex = '100';
         this.container.appendChild(this.yAxisSvg);
+
+        let yAxisBg = document.createElementNS(svgns, 'rect') as SVGRectElement;
+        yAxisBg.setAttribute('x', '0');
+        yAxisBg.setAttribute('y', '0');
+        yAxisBg.setAttribute('width', this.yAxisXPos.toString());
+        yAxisBg.setAttribute('height', this.viewBoxHeight.toString());
+        yAxisBg.setAttribute('style', 'fill:#ffffff;fill-opacity:0.5;stroke-width:0');
+        this.yAxisSvg.appendChild(yAxisBg);
 
         let yAxis = document.createElementNS(svgns, 'line') as SVGLineElement;
         yAxis.setAttribute('x1', this.yAxisXPos.toString());
