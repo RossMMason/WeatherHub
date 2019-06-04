@@ -149,7 +149,7 @@ export default class WindRose {
         this.arrowAnimation.setAttribute('type', 'rotate');
         this.arrowAnimation.setAttribute('from', this.currentPos.toString() + ' ' + this.centre.toString() + ' ' + this.centre.toString());
         this.arrowAnimation.setAttribute('to', this.currentPos.toString() + ' ' + this.centre.toString() + ' ' + this.centre.toString());
-        this.arrowAnimation.setAttribute('dur', '0.5s');
+        this.arrowAnimation.setAttribute('dur', '1s');
         this.arrowAnimation.setAttribute('repeatCount', '1');
         this.arrow.appendChild(this.arrowAnimation);
 

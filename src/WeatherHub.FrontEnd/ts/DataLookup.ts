@@ -15,14 +15,14 @@ export default class DataLookup<T extends TimeIndexed> {
         return (key in this.store);
     }
 
-    public addData(stationReading: T) {
+    public addData(data: T) {
 
-        if (!stationReading) {
+        if (!data) {
             return;
         }
 
-        let key = this.getKey(stationReading.when);
-        this.store[key] = stationReading;
+        let key = this.getKey(data.when);
+        this.store[key] = data;
     }
 
     public getData(date: Date): T | null {
@@ -36,7 +36,35 @@ export default class DataLookup<T extends TimeIndexed> {
     }
 
     private getKey(date: Date): string {
-        let key = date.toUTCString();
+        let key = date.toISOString();
         return key;
+    }
+
+    public getBetweenDates(startDate: Date, endDate: Date): T[] {
+
+        let filteredItems: T[] = []; 
+
+        let startDateIsoString = startDate.toISOString();
+        let endDateIsoString = endDate.toISOString();
+
+        let filteredDataElements: T[] = [];
+
+        for (let key in this.store) {
+            if (key >= startDateIsoString && key <= endDateIsoString) {
+                filteredDataElements.push(this.store[key]);
+            }
+        }
+
+        return filteredDataElements;
+    }
+
+    public getValues() {
+        let values: T[] = [];
+
+        for (let key in this.store) {
+            values.push(this.store[key]);
+        }
+
+        return values;
     }
 }

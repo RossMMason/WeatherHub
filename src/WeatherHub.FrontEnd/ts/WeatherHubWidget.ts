@@ -114,7 +114,7 @@ export default class WeatherHubWidget {
             },
         ]
 
-        let windStrengthYAxisLabels: YAxisLabel[] = [
+        /*let windStrengthYAxisLabels: YAxisLabel[] = [
             { y: 5, label: '5' },
             { y: 10, label: '10' },
             { y: 15, label: '15' },
@@ -123,10 +123,10 @@ export default class WeatherHubWidget {
             { y: 30, label: '30' },
             { y: 35, label: '35' },
             { y: 40, label: '40' },
-        ];
+        ];*/
 
 
-        this.windStrengthChart = new TimeSeriesChart(this.windStrengthContainer, 24, windStrengthSeries, this.labelColor, false, windStrengthYAxisLabels);
+        this.windStrengthChart = new TimeSeriesChart(this.windStrengthContainer, 24, windStrengthSeries, this.labelColor, true);
     }
 
     private loadInitialData() {

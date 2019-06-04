@@ -10,6 +10,7 @@
     getMinutes
 } from 'date-fns';
 import DataLookup from './DataLookup';
+import { debounce } from 'ts-debounce';
 
 const svgns = 'http://www.w3.org/2000/svg';
 
@@ -24,6 +25,7 @@ export default class TimeSeriesChart {
 
     private viewBoxHeight = 250; 
     private viewBoxWidth = 700;
+    private viewBoxMinX = 0;
     private xPerMinute: number;
     private chartTotalMinutes: number;
 
@@ -57,8 +59,11 @@ export default class TimeSeriesChart {
     private yAxisTickX2: number;
 
     private yZeroPosition: number;
-    private yPixelsPerUnit: number;
+    private yPixelsPerUnit: number = 0;
     private yAxisLabelRightPos: number;
+    private debouncedScaleYAxis: () => void;
+    private calculatedMaxY: number;
+    private calculatedTickInterval: number;
 
 
     constructor(
@@ -68,6 +73,7 @@ export default class TimeSeriesChart {
         tickColor: string,
         autoScaleYAxis: boolean,
         yAxisLabels?: YAxisLabel[]) {
+        this.debouncedScaleYAxis = debounce(this.scaleYAxis, 100);
         this.seriesData = new DataLookup<SeriesData>();
         this.autoScaleYAxis = autoScaleYAxis;
         this.yAxisLabels = yAxisLabels;
@@ -83,6 +89,62 @@ export default class TimeSeriesChart {
         this.scheduleNextUpdate();
     }
 
+    private scaleYAxis() {
+
+        if (!this.autoScaleYAxis) {
+            this.redrawYAxisTicksAndLabels();
+            this.reRenderSeriesData();
+            return;
+        }
+
+        // Get maximum y within viewport
+        let viewStartDate = this.getDateForXVal(this.viewBoxMinX);
+        let viewEndDate = this.getDateForXVal(this.viewBoxMinX + this.viewBoxWidth);
+
+        let inViewSeriesData = this.seriesData.getBetweenDates(viewStartDate, viewEndDate);
+
+        let thisMaxY = 0; 
+        for (let i = 0; i < inViewSeriesData.length; i++) {
+
+            for (let j = 0; j < inViewSeriesData[i].seriesData.length; j++) {
+                if (inViewSeriesData[i].seriesData[j] > thisMaxY) {
+                    thisMaxY = inViewSeriesData[i].seriesData[j];
+                }
+            }
+        }
+
+        while (thisMaxY % 10 !== 0) {
+            thisMaxY++;
+        }
+
+        if (thisMaxY === this.calculatedMaxY) {
+            return;
+        }
+
+        this.calculatedMaxY = thisMaxY;
+
+        this.calculatedTickInterval = 0; 
+
+        if (thisMaxY <= 100) {
+            let intervalOptions = [2, 5, 10, 20]
+            for (let i = 0; i < intervalOptions.length; i++) {
+                if ((thisMaxY / intervalOptions[i]) <= 8) {
+                    this.calculatedTickInterval = intervalOptions[i];
+                    break;
+                } 
+            }
+        } else {
+            let intervalOption = 10;
+            while ((thisMaxY / intervalOption) > 8) {
+                intervalOption += 10; 
+            }
+            this.calculatedTickInterval = intervalOption;
+        }
+
+        this.redrawYAxisTicksAndLabels();
+        this.reRenderSeriesData();
+    }
+
     public addDataPoint(dataPoint: DataPoint) {
 
         if (dataPoint.seriesData.length != this.numSeries) {
@@ -94,26 +156,29 @@ export default class TimeSeriesChart {
             // todo
 
         } else {
-            let gPoints = this.renderDataPoint(dataPoint);
+            let graphics = this.renderDataPoint(dataPoint);
 
             let newSeriesData: SeriesData = {
                 when: dataPoint.when,
                 seriesData: dataPoint.seriesData,
-                gPoints: gPoints
+                seriesGraphics: graphics
             };
 
             this.seriesData.addData(newSeriesData);
         }
 
+        this.debouncedScaleYAxis();
     }
 
-    private renderDataPoint(dataPoint: DataPoint): SVGElement[] {
+    private renderDataPoint(dataPoint: DataPoint): SeriesDatapointGraphics[] {
 
         let timeSeriesChart = this;
 
         let x = this.getXPosForDate(dataPoint.when);
 
         let gPoints = dataPoint.seriesData.map(function (seriesDataPoint, seriesIndex) {
+
+            
 
             let y = timeSeriesChart.getYUnitsForValue(seriesDataPoint);
 
@@ -129,7 +194,7 @@ export default class TimeSeriesChart {
             gPointAnimation.setAttribute('type', 'translate');
             gPointAnimation.setAttribute('from', '0,0');
             gPointAnimation.setAttribute('to', '0,' + -y.toString());
-            gPointAnimation.setAttribute('dur', '0.5s');
+            gPointAnimation.setAttribute('dur', '1s');
             gPointAnimation.setAttribute('repeatCount', '1');
             gPoint.appendChild(gPointAnimation);
 
@@ -137,14 +202,35 @@ export default class TimeSeriesChart {
 
             timeSeriesChart.chartSvg.appendChild(gPoint);
 
-            return gPoint as SVGElement;
+            let graphics: SeriesDatapointGraphics = {
+                gPoint: gPoint,
+                gAnimation: gPointAnimation
+            }
+
+            return graphics
         });
 
         return gPoints;
     }
 
-    private reRenderDataPoint(dataPoint) {
+    private reRenderSeriesData() {
 
+        let seriesData = this.seriesData.getValues();
+
+        for (let i = 0; i < seriesData.length; i++) {
+
+            for (let j = 0; j < seriesData[i].seriesGraphics.length; j++) {
+                let graphics = seriesData[i].seriesGraphics[j];
+
+                let y = this.getYUnitsForValue(seriesData[i].seriesData[j]);
+
+                let previousYTranslation = graphics.gAnimation.getAttribute('to');
+                graphics.gAnimation.setAttribute('from', previousYTranslation);
+                graphics.gAnimation.setAttribute('to', '0,' + -y.toString());
+
+                graphics.gPoint.setAttribute('transform', 'translate(' + 0 + ', ' + -y.toString() + ')');
+            }
+        }     
     }
 
     private calculateKeyFigures() {
@@ -223,6 +309,11 @@ export default class TimeSeriesChart {
         return differenceInMinutes(date, this.zeroXDate) * this.xPerMinute;
     }
 
+    private getDateForXVal(xVal: number): Date {
+        let diffInMinutes = xVal / this.xPerMinute;
+        return addMinutes(this.zeroXDate, diffInMinutes);
+    } 
+
     private drawXAxisTickAndLabel(date: Date) {
         let x = this.getXPosForDate(date);
 
@@ -278,15 +369,46 @@ export default class TimeSeriesChart {
         this.drawYAxisBasedOnInViewData();
     }
 
-    private drawYAxisFromSuppliedLables() {
+    
 
+    private getYPosForValue(value: number) {
+        return this.yZeroPosition - (value * this.yPixelsPerUnit);
+    }
+
+    private getYUnitsForValue(value: number) {
+        return (value * this.yPixelsPerUnit);
+    }
+
+    private drawYAxisFromSuppliedLables() {
         let maxY = Math.max(... this.yAxisLabels.map(function (label) { return label.y }));
+        this.drawYAxis(maxY, this.yAxisLabels);
+    }
+
+    private drawYAxisBasedOnInViewData() {
+
+        let labels: YAxisLabel[] = [];
+
+        let val = this.calculatedTickInterval; 
+
+        while (val <= this.calculatedMaxY) {
+            labels.push(
+                {
+                    y: val,
+                    label: val.toString()
+                });
+            val += this.calculatedTickInterval;
+        }
+
+        this.drawYAxis(this.calculatedMaxY, labels);
+    }
+
+    private drawYAxis(maxY: number, labels: YAxisLabel[]) {
         this.yPixelsPerUnit = (this.viewBoxHeight - (this.viewBoxHeight - this.yZeroPosition) - this.yPaddingTop) / maxY;
 
-        for (let i = 0; i < this.yAxisLabels.length; i++) {
+        for (let i = 0; i < labels.length; i++) {
 
             //let yPos = this.yZeroPosition - (this.yAxisLabels[i].y * this.yPixelsPerUnit);
-            let yPos = this.getYPosForValue(this.yAxisLabels[i].y);
+            let yPos = this.getYPosForValue(labels[i].y);
 
             let tick = document.createElementNS(svgns, 'line') as SVGLineElement;
             tick.setAttribute('x1', this.yAxisTickX1.toString());
@@ -311,27 +433,14 @@ export default class TimeSeriesChart {
             label.setAttribute('y', yPos.toString());
             label.setAttribute('text-anchor', 'end');
             label.setAttribute('dominant-baseline', 'middle');
-            label.innerHTML = this.yAxisLabels[i].label;
+            label.innerHTML = labels[i].label;
             label.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + '; font-weight:bold');
             this.yAxisSvg.appendChild(label);
             this.yAxisSvgLabels.push(label);
         }
     }
 
-    private getYPosForValue(value: number) {
-        return this.yZeroPosition - (value * this.yPixelsPerUnit);
-    }
-
-    private getYUnitsForValue(value: number) {
-        return (value * this.yPixelsPerUnit);
-    }
-
-    private drawYAxisBasedOnInViewData() {
-        // TODO
-    }
-
     private render() {
-        
         this.yAxisSvg = document.createElementNS(svgns, 'svg');
         this.yAxisSvg.style.width = '100%';
         this.yAxisSvg.style.height = 'auto';
@@ -374,10 +483,6 @@ export default class TimeSeriesChart {
         xAxis.setAttribute('y2', this.minorXTickY1.toString());
         xAxis.setAttribute('style', 'stroke:' + this.tickColor + ';stroke-width:2'); 
         this.chartSvg.appendChild(xAxis);
-
-       
-
-        this.redrawYAxisTicksAndLabels();
     }
 
     private scheduleNextUpdate() {
@@ -426,8 +531,12 @@ export type DataPoint = {
 }
 
 type SeriesData = {
-
     when: Date,
     seriesData: number[],
-    gPoints: SVGElement[]
+    seriesGraphics: SeriesDatapointGraphics[]
+}
+
+type SeriesDatapointGraphics = {
+    gPoint: SVGElement;
+    gAnimation: SVGElement
 }
