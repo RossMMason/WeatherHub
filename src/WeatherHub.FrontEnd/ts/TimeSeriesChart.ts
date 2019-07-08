@@ -86,11 +86,10 @@ export default class TimeSeriesChart {
         this.calculateKeyFigures();
         this.render();
         this.createMissingIntervals();
-        this.scheduleNextUpdate();
+        this.scheduleNextViewBoxMove();
     }
 
     private scaleYAxis() {
-
         if (!this.autoScaleYAxis) {
             this.redrawYAxisTicksAndLabels();
             this.reRenderSeriesData();
@@ -369,8 +368,6 @@ export default class TimeSeriesChart {
         this.drawYAxisBasedOnInViewData();
     }
 
-    
-
     private getYPosForValue(value: number) {
         return this.yZeroPosition - (value * this.yPixelsPerUnit);
     }
@@ -485,23 +482,24 @@ export default class TimeSeriesChart {
         this.chartSvg.appendChild(xAxis);
     }
 
-    private scheduleNextUpdate() {
+    private scheduleNextViewBoxMove() {
         let currentEndDate = addMinutes(startOfMinute(new Date()), 1);
         let timeUntilUpdate = differenceInMilliseconds(currentEndDate, new Date());
-        setTimeout(this.updateDisplay.bind(this), timeUntilUpdate);
+        setTimeout(this.drawXIntervalsAndMoveViewbox.bind(this), timeUntilUpdate);
     }
 
-    private updateDisplay() {
+    private drawXIntervalsAndMoveViewbox() {
         this.createMissingIntervals();
-        this.moveToCurrentTime();
-        this.scheduleNextUpdate();
+        this.moveViewBoxToCurrentTime();
+        this.scheduleNextViewBoxMove();
     }
 
-    private moveToCurrentTime() {
+    private moveViewBoxToCurrentTime() {
         let currentEndDate = addMinutes(startOfMinute(new Date()), 1);
         let currentStartDate = addHours(currentEndDate, -this.showHours); 
         let xOffset = differenceInMinutes(currentStartDate, this.zeroXDate) * this.xPerMinute;
         this.chartSvg.setAttributeNS(null, 'viewBox', xOffset.toString() + ' 0 ' + this.viewBoxWidth + ' ' + this.viewBoxHeight);
+        this.scaleYAxis();
     }
 }
 
