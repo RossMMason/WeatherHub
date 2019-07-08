@@ -4,9 +4,16 @@ import { debounce } from 'ts-debounce';
 export default class WindRose {
     private container: HTMLDivElement;
     private svg: SVGSVGElement;
-    private renderSize = 600;
+    private renderSize = 300;
     private centre: number;
     private tickEndPos: number;
+
+    private avgWindColour: string;
+    private gustWindColour: string;
+
+    private avgWindSpeedElement: SVGTextElement;
+    private gustWindSpeedElement: SVGTextElement;
+    private windDirectionElement: SVGTextElement;
 
     private currentPos = 0;
 
@@ -25,6 +32,8 @@ export default class WindRose {
         tickColor: string,
         arrowColor: string, 
         labelColor: string,
+        avgWindColour: string,
+        gustWindColour: string
     ) {
 
         this.debouncedMoveToPosition = debounce(this.moveToPosition, 100);
@@ -32,17 +41,26 @@ export default class WindRose {
         this.tickColor = tickColor;
         this.arrowColor = arrowColor;
         this.labelColor = labelColor;
+        this.avgWindColour = avgWindColour;
+        this.gustWindColour = gustWindColour;
 
         this.setKeyPoints();
         this.render();
     }
 
-    public displayNewDataPoint(when: Date, windDegrees: number) {
+    public displayNewDataPoint(when: Date, windDegrees: number, avgWindSpeed: number, gustWindSpeed) {
 
         if (!this.mostRecentReading || this.mostRecentReading < when) {
             this.debouncedMoveToPosition(windDegrees);
+            this.updateLabels(windDegrees, avgWindSpeed, gustWindSpeed);
             this.mostRecentReading = when;
         }
+    }
+
+    private updateLabels(windDegrees: number, avgWindSpeed: number, gustWindSpeed: number) {
+        this.avgWindSpeedElement.innerHTML = Math.round(avgWindSpeed).toString() + ' mph';
+        this.gustWindSpeedElement.innerHTML = Math.round(gustWindSpeed).toString() + ' mph';
+        this.windDirectionElement.innerHTML = Math.round(windDegrees).toString() + '&deg;';
     }
 
     private moveToPosition(degrees: number) {
@@ -58,7 +76,7 @@ export default class WindRose {
 
     private setKeyPoints() {
         this.centre = this.renderSize / 2;
-        this.tickEndPos = 600 / 18;
+        this.tickEndPos = this.renderSize / 10;
     }
 
     private render() {
@@ -74,11 +92,48 @@ export default class WindRose {
 
         this.drawTicks(10, 2, 45);
         this.drawTicks(7, 1, 5);
-        this.drawLabels();
+        this.drawTickLabels();
         this.drawArrow();
+        this.drawCentreLabels();
     }
 
-    private drawLabels() {
+    private drawCentreLabels() {
+
+        let avgWindSpeedSize = Math.round(this.renderSize / 12);
+        let maxWindSpeedSize = Math.round(this.renderSize / 12);
+        let directionSize = Math.round(this.renderSize / 20);
+
+        let yOffsett = ((directionSize * 1.3) + (avgWindSpeedSize * 1.3)) / 2; 
+
+        this.avgWindSpeedElement = document.createElementNS(svgns, 'text') as SVGTextElement;
+        this.avgWindSpeedElement.setAttribute('style', 'font: bold ' + avgWindSpeedSize.toString() + 'px sans-serif; fill: ' + this.avgWindColour + ';');
+        this.avgWindSpeedElement.setAttribute('x', this.centre.toString());
+        this.avgWindSpeedElement.setAttribute('y', (this.centre - yOffsett).toString());
+        this.avgWindSpeedElement.setAttribute('text-anchor', 'middle');
+        this.avgWindSpeedElement.setAttribute('dominant-baseline', 'middle');
+        this.svg.appendChild(this.avgWindSpeedElement);
+
+        this.gustWindSpeedElement = document.createElementNS(svgns, 'text') as SVGTextElement;
+        this.gustWindSpeedElement.setAttribute('style', 'font: bold ' + maxWindSpeedSize.toString() + 'px sans-serif; fill: ' + this.gustWindColour + ';');
+        this.gustWindSpeedElement.setAttribute('x', this.centre.toString());
+        this.gustWindSpeedElement.setAttribute('y', (this.centre + yOffsett).toString());
+        this.gustWindSpeedElement.setAttribute('text-anchor', 'middle');
+        this.gustWindSpeedElement.setAttribute('dominant-baseline', 'middle');
+        this.svg.appendChild(this.gustWindSpeedElement);
+
+        this.windDirectionElement = document.createElementNS(svgns, 'text') as SVGTextElement;
+        this.windDirectionElement.setAttribute('style', 'font: bold ' + directionSize.toString() + 'px sans-serif; fill: ' + this.labelColor + ';');
+        this.windDirectionElement.setAttribute('x', this.centre.toString());
+        this.windDirectionElement.setAttribute('y', this.centre.toString());
+        this.windDirectionElement.setAttribute('text-anchor', 'middle');
+        this.windDirectionElement.setAttribute('dominant-baseline', 'middle');
+        this.svg.appendChild(this.windDirectionElement);
+    }
+
+    private drawTickLabels() {
+
+        let majorFontSize = Math.round(this.renderSize / 20);
+        let minorFontSize = Math.round(this.renderSize / 30);
 
         let labels = [
             { label: 'N', degrees: 0, isMajor: true },
@@ -94,16 +149,16 @@ export default class WindRose {
         for (let i = 0; i < labels.length; i++) {
             let thisLabel = document.createElementNS(svgns, 'text') as SVGElement;
             if (labels[i].isMajor) {
-                thisLabel.setAttribute('style', 'font: bold 20px sans-serif; fill: ' + this.labelColor + ';');
+                thisLabel.setAttribute('style', 'font: bold ' + majorFontSize.toString() + 'px sans-serif; fill: ' + this.labelColor + ';');
             } else {
-                thisLabel.setAttribute('style', 'font: bold 14px sans-serif; fill: ' + this.labelColor + ';');
+                thisLabel.setAttribute('style', 'font: bold ' + minorFontSize.toString() + 'px sans-serif; fill: ' + this.labelColor + ';');
             }
-            thisLabel.setAttribute('x', '300');
-            thisLabel.setAttribute('y', '15');
+            thisLabel.setAttribute('x', this.centre.toString());
+            thisLabel.setAttribute('y', ((majorFontSize * 1.2) / 2).toString());
             thisLabel.setAttribute('text-anchor', 'middle');
             thisLabel.setAttribute('dominant-baseline', 'middle');
             thisLabel.innerHTML = labels[i].label;
-            thisLabel.setAttribute('transform', 'rotate(' + labels[i].degrees.toString() + ', 300, 300)');
+            thisLabel.setAttribute('transform', 'rotate(' + labels[i].degrees.toString() + ',' + this.centre.toString() + ',' + this.centre.toString() + ')');
             this.svg.appendChild(thisLabel);
         }
     }
@@ -127,17 +182,14 @@ export default class WindRose {
 
     private drawArrow() {
 
-        let arrowEndPoint = this.tickEndPos + 15;
-        let arrowSize = 25;
-        let arrowStartY = arrowEndPoint + arrowSize;
+        let arrowWidth = 30;
+        let arrowHeight = 40;
+        let arrowOuterPos = this.tickEndPos + 2;
 
-        let points = (this.centre - 3).toString() + ' ' + this.centre.toString(); 
-        points += ',' + (this.centre - 3).toString() + ' ' + arrowStartY.toString();
-        points += ',' + (this.centre - (arrowSize / 2)).toString() + ' ' + arrowStartY.toString();
-        points += ',' + this.centre.toString() + ' ' + arrowEndPoint.toString();
-        points += ',' + (this.centre + (arrowSize / 2)).toString() + ' ' + arrowStartY.toString()
-        points += ',' + (this.centre + 3).toString() + ' ' + arrowStartY.toString();
-        points += ',' + (this.centre + 3).toString() + ' ' + this.centre.toString(); 
+        let points = (this.centre - (arrowWidth / 2)).toString() + ' ' + arrowOuterPos.toString();
+        points += ',' + (this.centre + (arrowWidth / 2)).toString() + ' ' + arrowOuterPos.toString();
+        points += ',' + (this.centre).toString() + ' ' + (arrowOuterPos + arrowHeight).toString();
+        points += ',' + (this.centre - (arrowWidth / 2)).toString() + ' ' + arrowOuterPos.toString();
 
         this.arrow = document.createElementNS(svgns, 'polygon') as SVGPolygonElement;
         this.arrow.setAttribute('style', 'fill:' + this.arrowColor + ';');
@@ -149,7 +201,7 @@ export default class WindRose {
         this.arrowAnimation.setAttribute('type', 'rotate');
         this.arrowAnimation.setAttribute('from', this.currentPos.toString() + ' ' + this.centre.toString() + ' ' + this.centre.toString());
         this.arrowAnimation.setAttribute('to', this.currentPos.toString() + ' ' + this.centre.toString() + ' ' + this.centre.toString());
-        this.arrowAnimation.setAttribute('dur', '1s');
+        this.arrowAnimation.setAttribute('dur', '2s');
         this.arrowAnimation.setAttribute('repeatCount', '1');
         this.arrow.appendChild(this.arrowAnimation);
 
