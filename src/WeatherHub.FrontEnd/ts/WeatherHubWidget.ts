@@ -82,7 +82,7 @@ export default class WeatherHubWidget {
     }
 
     private initialiseSubWidgets() {
-        this.windRose = new WindRose(this.windRoseContainer, this.labelColor, this.gustColor, this.labelColor);
+        this.windRose = new WindRose(this.windRoseContainer, this.labelColor, this.labelColor, this.labelColor, this.avgWindColor, this.gustColor);
 
         let windDirectionSeries: SeriesInfo[] = [
             {
@@ -190,7 +190,7 @@ export default class WeatherHubWidget {
 
         this.windStrengthChart.addDataPoint(strengthDataPoint);
 
-        this.windRose.displayNewDataPoint(stationReading.when, stationReading.windDegrees);
+        this.windRose.displayNewDataPoint(stationReading.when, stationReading.windDegrees, stationReading.windAvgMph, stationReading.windAvgGustMph);
     }
 }
 

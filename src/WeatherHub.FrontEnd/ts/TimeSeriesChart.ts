@@ -193,7 +193,7 @@ export default class TimeSeriesChart {
             gPointAnimation.setAttribute('type', 'translate');
             gPointAnimation.setAttribute('from', '0,0');
             gPointAnimation.setAttribute('to', '0,' + -y.toString());
-            gPointAnimation.setAttribute('dur', '1s');
+            gPointAnimation.setAttribute('dur', '2s');
             gPointAnimation.setAttribute('repeatCount', '1');
             gPoint.appendChild(gPointAnimation);
 
