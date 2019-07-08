@@ -4,6 +4,7 @@
 
 namespace WeatherHub.FrontEnd.Models
 {
+    using System;
     using WeatherHub.Domain.Entities;
 
     public static class StationReadingExtensions
@@ -18,12 +19,11 @@ namespace WeatherHub.FrontEnd.Models
             dto.RainCmPerHour = stationReading.RainCmPerHour;
             dto.RelativeHumidity = stationReading.RelativeHumidity;
             dto.TempC = stationReading.TempC;
-            dto.When = stationReading.When;
+            dto.When = DateTime.SpecifyKind(stationReading.When, DateTimeKind.Utc);
             dto.WindChillC = stationReading.WindChillC;
             dto.WindDegrees = stationReading.WindDegrees;
             dto.WindAvgGustMph = stationReading.WindAvgGustMph;
             dto.WindAvgMph = stationReading.WindAvgMph;
-
             return dto;
         }
     }

@@ -31,11 +31,14 @@ namespace WeatherHub.Domain.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<StationReading>> FetchLatestReadingsAsync(Guid weatherStationId, DateTime startDateTime)
+        public async Task<IEnumerable<StationReading>> FetchReadingsAsync(Guid weatherStationId, DateTime startDateTime, DateTime endDateTime)
         {
             return await _dbContext
                 .StationReading
-                .Where(x => x.Station.Id == weatherStationId && x.When >= startDateTime)
+                .Where(x =>
+                    x.Station.Id == weatherStationId
+                    && x.When >= startDateTime
+                    && x.When <= endDateTime)
                 .OrderBy(x => x.When)
                 .ToListAsync();
         }
