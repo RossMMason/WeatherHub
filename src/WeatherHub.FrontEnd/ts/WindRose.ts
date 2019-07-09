@@ -154,7 +154,7 @@ export default class WindRose {
                 thisLabel.setAttribute('style', 'font: bold ' + minorFontSize.toString() + 'px sans-serif; fill: ' + this.labelColor + ';');
             }
             thisLabel.setAttribute('x', this.centre.toString());
-            thisLabel.setAttribute('y', ((majorFontSize * 1.2) / 2).toString());
+            thisLabel.setAttribute('y', ((majorFontSize * 1.5) / 2).toString());
             thisLabel.setAttribute('text-anchor', 'middle');
             thisLabel.setAttribute('dominant-baseline', 'middle');
             thisLabel.innerHTML = labels[i].label;
