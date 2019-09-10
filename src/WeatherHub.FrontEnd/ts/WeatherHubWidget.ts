@@ -27,6 +27,7 @@ export default class WeatherHubWidget {
     private windDirectionContainer: HTMLDivElement;
     private stationReadingLookup: DataLookup<StationReading>;
     private windStrengthContainer: HTMLDivElement;
+    private dataListContainer: HTMLDivElement;
     private windStrengthChart: TimeSeriesChart;
 
     constructor(
@@ -41,7 +42,7 @@ export default class WeatherHubWidget {
 
 
         this.addSubWidgets();
-        this.positionSubWidgets();
+        this.SubWidgetsAddIdentities();
         this.initialiseSubWidgets(); 
         this.loadInitialData();
     }
@@ -50,35 +51,84 @@ export default class WeatherHubWidget {
         this.innerContainer = document.createElement('div');
         this.innerContainer.style.position = 'relative';
         this.innerContainer.style.userSelect = 'none';
-
+        this.innerContainer.style.display = 'flex';
+        this.innerContainer.style.flexFlow = 'wrap';
+        this.innerContainer.style.width = '100%';
 
         this.windRoseContainer = document.createElement("div") as HTMLDivElement;
-        this.windRoseContainer.style.position = 'absolute';
         this.innerContainer.appendChild(this.windRoseContainer);
-
         this.windDirectionContainer = document.createElement("div") as HTMLDivElement;
-        this.windDirectionContainer.style.position = 'absolute';
         this.innerContainer.appendChild(this.windDirectionContainer);
+        this.dataListContainer = document.createElement("div") as HTMLDivElement;
 
+
+        //dataListMoveSomewareElse
+        for (var i = 0; i < 10; i++) {
+            var listBox = document.createElement("div") as HTMLDivElement;
+            listBox.setAttribute("class", "listBox");
+            var listTitle = document.createElement("div") as HTMLDivElement;
+            listTitle.setAttribute("class", "listTitle");
+            if (i == 5) {
+                listTitle.append("list Item " + i + " this ones extra long")
+            } else {
+                listTitle.append("list Item " + i)
+            }
+            
+            var listVal = document.createElement("div") as HTMLDivElement;
+            listVal.setAttribute("class", "listVal");
+            listVal.append(i.toString());
+            listBox.appendChild(listTitle);
+            listBox.appendChild(listVal);
+            this.dataListContainer.appendChild(listBox);
+        }
+
+        this.innerContainer.appendChild(this.dataListContainer);
         this.windStrengthContainer = document.createElement("div") as HTMLDivElement;
-        this.windStrengthContainer.style.position = 'absolute';
         this.innerContainer.appendChild(this.windStrengthContainer);
-        
         this.widgetContainer.appendChild(this.innerContainer);
+
+        //stylesheet creation
+        //TODO we should redraw this css file on page size change and move it to a relivent area...
+        var style = document.createElement('style');
+        document.head.appendChild(style);
+        var styleSheet = style.sheet as CSSStyleSheet
+        styleSheet.insertRule("div{box-sizing: border-box;}", 0)
+        styleSheet.insertRule("#WindStrengthContainer, #WindDirectionContainer {width: 75%; display: block; position: relative!important; margin: 0 2.5%;}",0)
+
+
+        styleSheet.insertRule(".listBox .listTitle{display: block; text-align: center; width: 100%; padding: 0.4rem}", 1)
+
+        styleSheet.insertRule(".listBox .listVal{display: block; text-align: center; width: 100%; font-size: 1.8rem;} ", 2)
+
+        styleSheet.insertRule("#WindRoseContainer, #DataTableContainer {width: 20%; display: block; position: relative!important;}", 3)
+        styleSheet.insertRule(".listBox {display:inline-flex; flex-wrap: wrap; margin: 0.5rem; min-height: 5.5rem;width: 5.5rem; font-family: Courier New, Courier, monospace; font-weight: 800; font-size: 0.7rem;}", 4);
+        styleSheet.insertRule(".listBox {background: #27AAE1; color: white;}", 5);
+
+        if (this.innerContainer.offsetWidth < 1227) {
+            console.log("InnerWidthIsUnder 1227");
+            styleSheet.insertRule(".listBox {min-height: 4rem; width: 4rem;}", 6)
+        }
+
+        if (this.innerContainer.offsetWidth < 1027) {
+            console.log("InnerWidthIsUnder 1027");
+            styleSheet.insertRule("#DataTableContainer {order: 4; width: 100%;}", 7)
+            styleSheet.insertRule("#WindStrengthContainer {width: 100%;}", 8)
+        }
+
+        if (this.innerContainer.offsetWidth < 576) {
+            console.log("InnerWidthIsUnder 576");
+            styleSheet.insertRule("#WindStrengthContainer, #WindDirectionContainer, #DataTableContainer{width: 100%; left: 0%;}", 8)
+            styleSheet.insertRule("#WindRoseContainer{width: 80%;margin: 0 10%;}", 8)
+            styleSheet.insertRule("#WindStrengthContainer {width: 100%;}", 8)
+        }
     }
 
-    private positionSubWidgets() {
-        this.windRoseContainer.style.width = "400px";
-        this.windRoseContainer.style.height = "400px";
+    private SubWidgetsAddIdentities() {
 
-        this.windDirectionContainer.style.width = "700px"
-        this.windDirectionContainer.style.height = "250px"
-        this.windDirectionContainer.style.left = "410px";
-
-        this.windStrengthContainer.style.width = "700px"
-        this.windStrengthContainer.style.height = "250px"
-        this.windStrengthContainer.style.left = "410px";
-        this.windStrengthContainer.style.top = "260px";
+        this.windStrengthContainer.setAttribute("id", "WindStrengthContainer");
+        this.windDirectionContainer.setAttribute("id", "WindDirectionContainer");
+        this.windRoseContainer.setAttribute("id", "WindRoseContainer");
+        this.dataListContainer.setAttribute("id", "DataTableContainer");
     }
 
     private initialiseSubWidgets() {
