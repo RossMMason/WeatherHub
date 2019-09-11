@@ -8,6 +8,7 @@ namespace WeatherHub.FrontEnd.Controllers
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
+    using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
     using WeatherHub.FrontEnd.Models;
 
@@ -17,21 +18,32 @@ namespace WeatherHub.FrontEnd.Controllers
     {
         private readonly ILogger<CurrentReadingController> _logger;
         private readonly IStationReadingRepository _stationReadingRepository;
+        private readonly IWeatherStationRepository _weatherStationRepository;
 
         public CurrentReadingController(
             ILogger<CurrentReadingController> logger,
-            IStationReadingRepository stationReadingRepository)
+            IStationReadingRepository stationReadingRepository,
+            IWeatherStationRepository weatherStationRepository)
         {
             _logger = logger;
             _stationReadingRepository = stationReadingRepository;
+            _weatherStationRepository = weatherStationRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<StationReadingDto>> Get(Guid weatherStationId)
         {
+
+            WeatherStation weatherStation = await _weatherStationRepository.GetByIdAsync(weatherStationId);
+
+            if (weatherStation == null)
+            {
+                return BadRequest($"Unknown weather station with id {weatherStationId}");
+            }
+
             var reading = await _stationReadingRepository.FetchLatestReadingAsync(weatherStationId);
 
-            return Ok(reading.ToStationReadingDto());
+            return Ok(reading.ToStationReadingDto(weatherStation.AltitudeM));
         }
     }
 }

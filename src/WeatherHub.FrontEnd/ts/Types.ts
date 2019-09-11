@@ -26,6 +26,7 @@ export interface StationReadingDto {
     windAvgGustMph: number,
     windChillC: number,
     rainCmPerHour: number,
+    estimatedCloudBaseFt: number, 
 }
 
 export interface TimeIndexed {

@@ -9,9 +9,18 @@ namespace WeatherHub.FrontEnd.Models
 
     public static class StationReadingExtensions
     {
-        public static StationReadingDto ToStationReadingDto(this StationReading stationReading)
+        /// <summary>
+        /// Returns station reading DTO to be used by clients.
+        /// Note: Cloudbase calculations taken from https://en.wikipedia.org/wiki/Cloud_base
+        /// </summary>
+        /// <param name="stationReading">The station reading.</param>
+        /// <param name="stationHeightInM">The station height in M</param>
+        /// <returns>Station reading Data Transfer Object.</returns>
+        ///
+        public static StationReadingDto ToStationReadingDto(this StationReading stationReading, float stationHeightInM)
         {
             StationReadingDto dto = new StationReadingDto();
+
             dto.DewpointC = stationReading.DewpointC;
             dto.HeatIndexC = stationReading.HeatIndexC;
             dto.Id = stationReading.Id;
@@ -24,6 +33,11 @@ namespace WeatherHub.FrontEnd.Models
             dto.WindDegrees = stationReading.WindDegrees;
             dto.WindAvgGustMph = stationReading.WindAvgGustMph;
             dto.WindAvgMph = stationReading.WindAvgMph;
+
+            float spread = stationReading.TempC - stationReading.DewpointC;
+            float cloudBaseAgl = spread / 2.5f * 1000;
+            dto.EstimatedCloudBaseFt = cloudBaseAgl + stationHeightInM.ToFeetFromM();
+
             return dto;
         }
     }

@@ -9,20 +9,20 @@
     "publish": "npm run release && dotnet publish -c Release"
   },
   "dependencies": {
-    "date-fns": "^1.30.1",
     "@aspnet/signalr": "^1.1.4"
   },
   "devDependencies": {
     "axios": "^0.18.1",
-    "clean-webpack-plugin": "1.0.1",
-    "css-loader": "2.1.0",
+    "clean-webpack-plugin": "^1.0.1",
+    "css-loader": "^2.1.0",
+    "date-fns": "^1.30.1",
     "html-webpack-plugin": "4.0.0-beta.5",
-    "mini-css-extract-plugin": "0.5.0",
+    "mini-css-extract-plugin": "^0.5.0",
     "ts-debounce": "^1.0.0",
-    "ts-loader": "5.3.3",
+    "ts-loader": "^5.3.3",
     "typescript": "3.3.3",
-    "webpack": "4.29.3",
-    "webpack-cli": "3.2.3"
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3"
   },
   "-vs-binding": {
     "ProjectOpened": [
