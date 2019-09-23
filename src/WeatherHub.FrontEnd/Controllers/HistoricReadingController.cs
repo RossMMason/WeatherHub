@@ -10,6 +10,7 @@ namespace WeatherHub.FrontEnd.Controllers
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
+    using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
     using WeatherHub.FrontEnd.Models;
 
@@ -19,13 +20,16 @@ namespace WeatherHub.FrontEnd.Controllers
     {
         private readonly ILogger<CurrentReadingController> _logger;
         private readonly IStationReadingRepository _stationReadingRepository;
+        private readonly IWeatherStationRepository _weatherStationRepository;
 
         public HistoricReadingController(
             ILogger<CurrentReadingController> logger,
-            IStationReadingRepository stationReadingRepository)
+            IStationReadingRepository stationReadingRepository,
+            IWeatherStationRepository weatherStationRepository)
         {
             _logger = logger;
             _stationReadingRepository = stationReadingRepository;
+            _weatherStationRepository = weatherStationRepository;
         }
 
         [HttpGet]
@@ -46,9 +50,16 @@ namespace WeatherHub.FrontEnd.Controllers
                 return BadRequest("You may request a maximum of one weeks data per request.");
             }
 
+            WeatherStation weatherStation = await _weatherStationRepository.GetByIdAsync(weatherStationId);
+
+            if (weatherStation == null)
+            {
+                return BadRequest($"Unknown weather station with id {weatherStationId}");
+            }
+
             var readings = await _stationReadingRepository
                 .FetchReadingsAsync(weatherStationId, rangeStart, rangeEnd.Value)
-                .ContinueWith(x => x.Result.Select(y => y.ToStationReadingDto()));
+                .ContinueWith(x => x.Result.Select(y => y.ToStationReadingDto(weatherStation.AltitudeM)));
 
             return Ok(readings);
         }

@@ -20,5 +20,10 @@ namespace WeatherHub.FrontEnd.Models
         {
             return inHG / 0.029530f;
         }
+
+        public static float ToFeetFromM(this float metres)
+        {
+            return metres * 3.280839895f;
+        }
     }
 }

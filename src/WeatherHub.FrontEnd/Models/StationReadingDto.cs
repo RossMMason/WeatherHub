@@ -31,5 +31,7 @@ namespace WeatherHub.FrontEnd.Models
         public float WindChillC { get; set; }
 
         public float RainCmPerHour { get; set; }
+
+        public float EstimatedCloudBaseFt { get; set; }
     }
 }

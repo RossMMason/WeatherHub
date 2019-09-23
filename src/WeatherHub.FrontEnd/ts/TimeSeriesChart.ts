@@ -467,7 +467,7 @@ export default class TimeSeriesChart {
         this.chartSvg = document.createElementNS(svgns, 'svg');
         this.chartSvg.style.width = '100%';
         this.chartSvg.style.height = 'auto';
-        this.chartSvg.style.position = 'absolute';
+        this.chartSvg.style.position = 'relative';
         this.chartSvg.setAttributeNS(null, 'viewBox', '0 0 ' + this.viewBoxWidth + ' ' + this.viewBoxHeight);
         this.chartSvg.style.width = '100%';
         this.chartSvg.style.height = 'auto';
