@@ -63,6 +63,16 @@ export interface StationDayStatistics {
     windHighTime: Date 
 }
 
+export interface StationStatistics {
+    dayStatistics: StationDayStatistics
+    lastRain: Date | null
+}
+
+export interface StationStatisticsDto {
+    dayStatistics: StationDayStatistics
+    lastRain: Date | null
+}
+
 export interface StationDayStatisticsDto {
     id: string,
     date: string,

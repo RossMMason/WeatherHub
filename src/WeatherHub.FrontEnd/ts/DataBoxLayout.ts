@@ -85,11 +85,16 @@ export default class DataBoxLayout {
                 return Math.round(value).toString() + ' mm';
             });
 
-        this.lastRain = new DataBox<Date>(
+        this.lastRain = new DataBox<Date | null>(
             this.dataTable,
             'Last Rain',
-            function (when: Date) {
-                return format(when, 'DD MMM') + '<br>' + format(when, 'HH:mm');
+            function (when: Date | null) {
+
+                if (when) {
+                    return format(when, 'DD MMM') + '<br>' + format(when, 'HH:mm');
+                } else {
+                    '-';
+                }
             });
 
         this.windHigh = new DataBox<WindHigh>(

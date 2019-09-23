@@ -13,18 +13,21 @@ namespace WeatherHub.FrontEnd.Controllers
     using WeatherHub.Domain.Repositories;
     using WeatherHub.FrontEnd.Models;
 
-    [Route("weather/{weatherStationId}/day-statistics")]
+    [Route("weather/{weatherStationId}/statistics")]
     [ApiController]
-    public class DayStatisticsController : Controller
+    public class StatisticsController : Controller
     {
         private IStationDayStatisticsRepository _stationDayStatisticsRepository;
+        private IStationReadingRepository _stationReadingRepository;
         private IWeatherStationRepository _weatherStationRepository;
 
-        public DayStatisticsController(
+        public StatisticsController(
             IStationDayStatisticsRepository stationDayStatisticsRepository,
+            IStationReadingRepository stationReadingRepository,
             IWeatherStationRepository weatherStationRepository)
         {
             _stationDayStatisticsRepository = stationDayStatisticsRepository;
+            _stationReadingRepository = stationReadingRepository;
             _weatherStationRepository = weatherStationRepository;
         }
 
@@ -40,8 +43,15 @@ namespace WeatherHub.FrontEnd.Controllers
             }
 
             var stationDayStatistics = await _stationDayStatisticsRepository.FetchForDateAsync(weatherStation.Id, forDate.Date);
+            var lastRain = await _stationReadingRepository.FetchLastRainDateAsync(weatherStationId);
 
-            return Ok(stationDayStatistics.ToStationDayStatisticsDto());
+            StationStatisticsDto dto = new StationStatisticsDto
+            {
+                DayStatistics = stationDayStatistics.ToStationDayStatisticsDto(),
+                LastRain = lastRain
+            };
+
+            return Ok(dto);
         }
     }
 }

@@ -42,5 +42,15 @@ namespace WeatherHub.Domain.Repositories
                 .OrderBy(x => x.When)
                 .ToListAsync();
         }
+
+        public async Task<DateTime?> FetchLastRainDateAsync(Guid weatherStationId)
+        {
+            return await _dbContext
+                .StationReading
+                .Where(x => x.RainCmPerHour > 0)
+                .OrderByDescending(x => x.When)
+                .Select(x => x.When)
+                .FirstOrDefaultAsync();
+        }
     }
 }

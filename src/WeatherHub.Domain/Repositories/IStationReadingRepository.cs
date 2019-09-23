@@ -15,5 +15,7 @@ namespace WeatherHub.Domain.Repositories
         Task<IEnumerable<StationReading>> FetchReadingsAsync(Guid weatherStationId, DateTime startDateTime, DateTime endDateTime);
 
         Task<StationReading> FetchLatestReadingAsync(Guid weatherStationId);
+
+        Task<DateTime?> FetchLastRainDateAsync(Guid weatherStationId);
     }
 }

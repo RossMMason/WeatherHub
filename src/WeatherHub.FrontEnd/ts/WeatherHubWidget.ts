@@ -3,7 +3,7 @@ import WindRose from './WindRose';
 import DataBoxLayout from './DataBoxLayout';
 import DataLookup from './DataLookup';
 import axios, { AxiosResponse } from 'axios';
-import { StationReading, StationReadingDto, StationDayStatisticsDto, StationDayStatistics } from './Types';
+import { StationReading, StationReadingDto, StationDayStatisticsDto, StationDayStatistics, StationStatisticsDto, StationStatistics } from './Types';
 import {
     addHours, format, parse
 } from 'date-fns';
@@ -60,8 +60,6 @@ export default class WeatherHubWidget {
             }
         });
     }
-
-
 
     private createStyleSheet() {
         //stylesheet creation
@@ -176,7 +174,7 @@ export default class WeatherHubWidget {
 
         let stationReadingUrl = this.weatherHubServer + '/weather/' + this.weatherStationId + '/historic-readings?rangeStart=' + startRange.toISOString() + '&rangeEnd=' + endRange.toISOString();
 
-        let stationDayStatisticsUrl = this.weatherHubServer + '/weather/' + this.weatherStationId + '/day-statistics/' + format(new Date(), 'YYYY-MM-DD')
+        let stationDayStatisticsUrl = this.weatherHubServer + '/weather/' + this.weatherStationId + '/statistics/' + format(new Date(), 'YYYY-MM-DD')
 
         let widget = this;
 
@@ -218,42 +216,47 @@ export default class WeatherHubWidget {
             });
 
 
-        axios.get<StationDayStatisticsDto>(stationDayStatisticsUrl)
+        axios.get<StationStatisticsDto>(stationDayStatisticsUrl)
             .then(function (response) {
 
-                let date = new Date(response.data.date);
+                let date = new Date(response.data.dayStatistics.date);
                 let dateStr = format(date, 'YYYY-MM-DD');
 
                 let stationDayStatistics: StationDayStatistics = {
-                    id: response.data.id,
+                    id: response.data.dayStatistics.id,
                     date: date,
-                    dewpointHighC: response.data.dewpointHighC,
-                    dewpointHighTime: parse(dateStr + 'T' + response.data.dewpointHighTime),
-                    dewpointLowC: response.data.dewpointLowC,
-                    dewpointLowTime: parse(dateStr + 'T' + response.data.dewpointLowTime),
-                    heatIndexHighC: response.data.heatIndexHighC,
-                    heatIndexHighTime: parse(dateStr + 'T' + response.data.heatIndexHighTime),
-                    pressureHighMbar: response.data.pressureHighMbar,
-                    pressureHighTime: parse(dateStr + 'T' + response.data.pressureHighTime),
-                    pressureLowMbar: response.data.pressureLowMbar,
-                    pressureLowTime: parse(dateStr + 'T' + response.data.pressureLowTime),
-                    rainRateHighCmPerHour: response.data.rainRateHighCmPerHour,
-                    relativeHumidityHigh: response.data.relativeHumidityHigh,
-                    relativeHumidyHighTime: parse(dateStr + 'T' + response.data.relativeHumidyHighTime),
-                    relativeHumidityLow: response.data.relativeHumidityLow,
-                    relativeHumidyLowTime: parse(dateStr + 'T' + response.data.relativeHumidyLowTime),
-                    tempHighC: response.data.tempHighC,
-                    tempHighTime: parse(dateStr + 'T' + response.data.tempHighTime),
-                    tempLowC: response.data.tempLowC,
-                    tempLowTime: parse(dateStr + 'T' + response.data.tempLowTime),
-                    totalRainCm: response.data.totalRainCm,
-                    windChillLowC: response.data.windChillLowC,
-                    windChillLowTime: parse(dateStr + 'T' + response.data.windChillLowTime),
-                    windHighMph: response.data.windHighMph,
-                    windHighTime: parse(dateStr + 'T' + response.data.windHighTime),
+                    dewpointHighC: response.data.dayStatistics.dewpointHighC,
+                    dewpointHighTime: parse(dateStr + 'T' + response.data.dayStatistics.dewpointHighTime),
+                    dewpointLowC: response.data.dayStatistics.dewpointLowC,
+                    dewpointLowTime: parse(dateStr + 'T' + response.data.dayStatistics.dewpointLowTime),
+                    heatIndexHighC: response.data.dayStatistics.heatIndexHighC,
+                    heatIndexHighTime: parse(dateStr + 'T' + response.data.dayStatistics.heatIndexHighTime),
+                    pressureHighMbar: response.data.dayStatistics.pressureHighMbar,
+                    pressureHighTime: parse(dateStr + 'T' + response.data.dayStatistics.pressureHighTime),
+                    pressureLowMbar: response.data.dayStatistics.pressureLowMbar,
+                    pressureLowTime: parse(dateStr + 'T' + response.data.dayStatistics.pressureLowTime),
+                    rainRateHighCmPerHour: response.data.dayStatistics.rainRateHighCmPerHour,
+                    relativeHumidityHigh: response.data.dayStatistics.relativeHumidityHigh,
+                    relativeHumidyHighTime: parse(dateStr + 'T' + response.data.dayStatistics.relativeHumidyHighTime),
+                    relativeHumidityLow: response.data.dayStatistics.relativeHumidityLow,
+                    relativeHumidyLowTime: parse(dateStr + 'T' + response.data.dayStatistics.relativeHumidyLowTime),
+                    tempHighC: response.data.dayStatistics.tempHighC,
+                    tempHighTime: parse(dateStr + 'T' + response.data.dayStatistics.tempHighTime),
+                    tempLowC: response.data.dayStatistics.tempLowC,
+                    tempLowTime: parse(dateStr + 'T' + response.data.dayStatistics.tempLowTime),
+                    totalRainCm: response.data.dayStatistics.totalRainCm,
+                    windChillLowC: response.data.dayStatistics.windChillLowC,
+                    windChillLowTime: parse(dateStr + 'T' + response.data.dayStatistics.windChillLowTime),
+                    windHighMph: response.data.dayStatistics.windHighMph,
+                    windHighTime: parse(dateStr + 'T' + response.data.dayStatistics.windHighTime),
                 };
 
-                return stationDayStatistics;
+                let statistics: StationStatistics = {
+                    dayStatistics: stationDayStatistics,
+                    lastRain: response.data.lastRain
+                }
+
+                return statistics;
             }, function (reason) {
                 console.log(reason);
 
@@ -261,9 +264,9 @@ export default class WeatherHubWidget {
                     console.log(reason.response.data);
                 }
             })
-            .then(function (stationDayStatistics) {
-                if (stationDayStatistics) {
-                    widget.broadcastStationDayStatistics(stationDayStatistics);
+            .then(function (stationStatistics) {
+                if (stationStatistics) {
+                    widget.broadcastStationStatistics(stationStatistics);
                 }
             });
     }
@@ -292,8 +295,8 @@ export default class WeatherHubWidget {
         this.dataBoxLayout.updateDewPoint(stationReading.dewpointC);
     }
 
-    private broadcastStationDayStatistics(stationDayStatistics: StationDayStatistics): any {
-        this.dataBoxLayout.updateRain(stationDayStatistics.totalRainCm, new Date());
-        this.dataBoxLayout.updateWindHighToday(stationDayStatistics.windHighMph, stationDayStatistics.windHighTime);
+    private broadcastStationStatistics(stationStatistics: StationStatistics): any {
+        this.dataBoxLayout.updateRain(stationStatistics.dayStatistics.totalRainCm, stationStatistics.lastRain);
+        this.dataBoxLayout.updateWindHighToday(stationStatistics.dayStatistics.windHighMph, stationStatistics.dayStatistics.windHighTime);
     }
 }
