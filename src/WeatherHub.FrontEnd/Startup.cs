@@ -13,6 +13,7 @@ namespace WeatherHub.FrontEnd
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.SignalR;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,7 @@ namespace WeatherHub.FrontEnd
     using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Migrations;
     using WeatherHub.Domain.Repositories;
+    using WeatherHub.FrontEnd.Hubs;
     using WeatherHub.FrontEnd.Services;
 
     public class Startup
@@ -56,6 +58,8 @@ namespace WeatherHub.FrontEnd
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsightsKey"]);
 
             services.AddHostedService<WeatherCollector>();
+
+            services.AddSignalR();
 
             var container = RegisterAutofacServices(services, Configuration);
             return container.Resolve<IServiceProvider>();
@@ -114,6 +118,11 @@ namespace WeatherHub.FrontEnd
             app.UseCors(WeatherHubCorsPolicyName);
             app.UseMvc();
 
+            app.UseSignalR(options =>
+            {
+                options.MapHub<StationUpdateHub>("/hubs/station-update-hub");
+            });
+
             loggerFactory.AddApplicationInsights(app.ApplicationServices, LogLevel.Warning);
         }
 
@@ -136,6 +145,9 @@ namespace WeatherHub.FrontEnd
                .WithParameter("options", dbContextOptionsBuilder.Options)
                .InstancePerLifetimeScope();
 
+            builder.RegisterType<GroupNameGenerator>()
+                .AsSelf();
+
             builder.Register<Func<WeatherStation, IWeatherDataFetcher>>(c =>
             {
                 var context = c.Resolve<IComponentContext>();
@@ -150,7 +162,9 @@ namespace WeatherHub.FrontEnd
                                 ws,
                                 context.Resolve<IDbContext>(),
                                 context.Resolve<IStationReadingRepository>(),
-                                context.Resolve<IStationDayStatisticsRepository>());
+                                context.Resolve<IStationDayStatisticsRepository>(),
+                                context.Resolve<IHubContext<StationUpdateHub, IStationUpdateHub>>(),
+                                context.Resolve<GroupNameGenerator>());
                         default:
                             throw new Exception($"Unsupported fetcher type: {ws.FetcherType}");
                     }
