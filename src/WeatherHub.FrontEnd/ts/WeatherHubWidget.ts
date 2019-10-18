@@ -72,32 +72,33 @@ export default class WeatherHubWidget {
         styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .weatherHubWidget .windDirectionChart {width: 70%; display: block; position: relative!important; margin: 0 5%;}", 1)
 
 
-        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding: 0.4rem}", 2)
+        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding: 0.4rem; color: #27AAE1;}", 2)
 
-        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxValue {display: block; text-align: center; width: 100%; font-size: 1rem;} ", 3)
+        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxValue {display: block; text-align: center; width: 100%; font-size: 0.8rem;} ", 3)
 
-        styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; display: block; position: relative!important;}", 4)
-        styleSheet.insertRule(".weatherHubWidget .dataBox {display:inline-flex; flex-wrap: wrap; margin: 0.5rem; min-height: 6rem;width: 10rem; font-family: Courier New, Courier, monospace; font-weight: 800; font-size: 0.7rem;}", 5);
-        styleSheet.insertRule(".weatherHubWidget .dataBox {background: #DCE0E2; color: #27AAE1;}", 6);
+        styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; display: block; position: relative!important; color: black;}", 4)
+        styleSheet.insertRule(".weatherHubWidget .dataBox {display:inline-flex; flex-wrap: wrap; margin: 0.5rem; min-height: 6rem;width: 10rem; font-family: sans-serif; font-weight: 800; font-size: 0.7rem;}", 5);
+        styleSheet.insertRule(".weatherHubWidget .dataBox {background: #DCE0E2;}", 6);
 
         if (this.innerContainer.offsetWidth < 1227) {
             console.log("InnerWidthIsUnder 1227");
-            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 4rem; width: 5.5rem;}", 7)
+            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 5rem; width: 5.5rem; }", 7)
+            styleSheet.insertRule("font-size: 0.7rem; font-weight: 700;} ", 8)
         }
 
         if (this.innerContainer.offsetWidth < 1027) {
             console.log("InnerWidthIsUnder 1027");
-            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 5.5rem; width: 6rem;}", 8)
-            styleSheet.insertRule(".weatherHubWidget .dataBoxLayout {order: 4; width: 100%;}", 9)
-            styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 10)
+            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 6rem; width: 6rem;}", 9)
+            styleSheet.insertRule(".weatherHubWidget .dataBoxLayout {order: 4; width: 100%;}", 10)
+            styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 11)
         }
 
         if (this.innerContainer.offsetWidth < 576) {
             console.log("InnerWidthIsUnder 576");
-            styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .windDirectionChart, #DataTableContainer{width: 100%!important; left: 0%;}", 11)
-            styleSheet.insertRule(".weatherHubWidget .windRose {width: 80%;margin: 0 10%;}", 12)
-            styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 13)
-            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 4rem; width: 40%; margin: 5px 5%}", 14)
+            styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .windDirectionChart, #DataTableContainer{width: 100%!important; left: 0%;}", 12)
+            styleSheet.insertRule(".weatherHubWidget .windRose {width: 80%;margin: 0 10%;}", 13)
+            styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 14)
+            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 4rem; width: 40%; margin: 5px 5%}", 15)
         }
     }
     private addSubWidgets() {
