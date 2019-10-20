@@ -91,7 +91,7 @@ export default class DataBoxLayout {
             function (when: Date | null) {
 
                 if (when) {
-                    return format(when, 'DD MMM') + '<br>' + format(when, 'HH:mm');
+                    return format(when, 'DD MMM') + ' ' + format(when, 'HH:mm');
                 } else {
                     '-';
                 }
@@ -101,7 +101,7 @@ export default class DataBoxLayout {
             this.dataTable,
             'Wind High',
             function (value: WindHigh) {
-                return Math.round(value.windSpeed).toString() + ' mph <br>' + format(value.when, 'DD MMM') + '<br>' +  format(value.when, 'HH:mm');
+                return Math.round(value.windSpeed).toString() + ' mph <br><span class="extra-info">' + format(value.when, 'DD MMM') + ' ' + format(value.when, 'HH:mm') + '</span>';
             });
 
         this.humidity = new DataBox<number>(

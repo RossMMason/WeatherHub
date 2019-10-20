@@ -7,6 +7,7 @@ import { StationReading, StationReadingDto, StationDayStatisticsDto, StationDayS
 import {
     addHours, format, parse
 } from 'date-fns';
+import { debounce } from 'ts-debounce';
 
 export default class WeatherHubWidget {
      
@@ -31,6 +32,10 @@ export default class WeatherHubWidget {
     private windStrengthContainer: HTMLDivElement;
     private dataBoxContainer: HTMLDivElement;
     private windStrengthChart: TimeSeriesChart;
+    private chartNumberOfHours: number = 24;
+
+    private debouncedHandleResize: () => void;
+
     dataBoxLayout: DataBoxLayout;
 
     constructor(
@@ -46,61 +51,85 @@ export default class WeatherHubWidget {
         this.addSubWidgets();
         this.initialiseSubWidgets(); 
         this.loadInitialData();
-        this.watchListener();
+        this.listenForResize();
+
+        this.debouncedHandleResize = debounce(this.handleResize, 250);
         
     }
 
-    private watchListener() {
-        let component = this;
+    private listenForResize() {
+        let widget = this;
         window.addEventListener("resize", function () {
-            component.innerContainer
-            if (component.windowWidth !== component.innerContainer.offsetWidth) {
-                document.getElementById("OverwritableStyle").remove();
-                component.createStyleSheet();
+            widget.innerContainer
+            if (widget.windowWidth !== widget.innerContainer.offsetWidth) {
+                widget.debouncedHandleResize();
             }
         });
     }
 
-    private createStyleSheet() {
-        //stylesheet creation
-        //TODO we should redraw this css file on page size change and move it to a relivent area...
+    private handleResize() {
+        let prevStyles = document.getElementById("wh-styles");
+
+        if (prevStyles) {
+            prevStyles.remove();
+        }
+
         var style = document.createElement('style');
-        style.id = "OverwritableStyle";
+        style.id = "wh-styles";
         document.head.appendChild(style);
         var styleSheet = style.sheet as CSSStyleSheet
-        styleSheet.insertRule(".weatherHubWidget div{box-sizing: border-box;}", 0)
-        styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .weatherHubWidget .windDirectionChart {width: 70%; display: block; position: relative!important; margin: 0 5%;}", 1)
+        styleSheet.insertRule(".weatherHubWidget .dataBox .extra-info {font-size:0.7em; color: #818181}", 0);
+        styleSheet.insertRule(".weatherHubWidget div{box-sizing: border-box;}", 1)
+        styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .weatherHubWidget .windDirectionChart {width: 70%; display: block; position: relative!important; margin: 0 5%;}", 2)
 
 
-        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding: 0.4rem; color: #27AAE1;}", 2)
+        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding: 0.4rem; color: #27AAE1;}", 3)
 
-        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxValue {display: block; text-align: center; width: 100%; font-size: 0.8rem;} ", 3)
+        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxValue {display: block; text-align: center; width: 100%; font-size: 0.8rem;} ", 4)
 
-        styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; display: block; position: relative!important; color: black;}", 4)
-        styleSheet.insertRule(".weatherHubWidget .dataBox {display:inline-flex; flex-wrap: wrap; margin: 0.5rem; min-height: 6rem;width: 10rem; font-family: sans-serif; font-weight: 800; font-size: 0.7rem;}", 5);
-        styleSheet.insertRule(".weatherHubWidget .dataBox {background: #DCE0E2;}", 6);
+        styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; display: block; position: relative!important; color: black;}", 5)
+        styleSheet.insertRule(".weatherHubWidget .dataBox {display:inline-flex; flex-wrap: wrap; margin: 0.5rem; min-height: 6rem;width: 10rem; font-family: sans-serif; font-weight: 800; font-size: 0.7rem; border-radius: 5px; border: solid 1px #ACACAC; }", 6);
+        styleSheet.insertRule(".weatherHubWidget .dataBox {background: #DCE0E2;}", 7);
 
         if (this.innerContainer.offsetWidth < 1227) {
             console.log("InnerWidthIsUnder 1227");
-            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 5rem; width: 5.5rem; }", 7)
-            styleSheet.insertRule("font-size: 0.7rem; font-weight: 700;} ", 8)
-        }
-
-        if (this.innerContainer.offsetWidth < 1027) {
-            console.log("InnerWidthIsUnder 1027");
-            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 6rem; width: 6rem;}", 9)
-            styleSheet.insertRule(".weatherHubWidget .dataBoxLayout {order: 4; width: 100%;}", 10)
-            styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 11)
+            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 5rem; width: 5.5rem; }", 8)
+            styleSheet.insertRule(".weatherHubWidget .dataBox {font-size: 0.7rem; font-weight: 700;} ", 9)
         }
 
         if (this.innerContainer.offsetWidth < 576) {
             console.log("InnerWidthIsUnder 576");
-            styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .windDirectionChart, #DataTableContainer{width: 100%!important; left: 0%;}", 12)
-            styleSheet.insertRule(".weatherHubWidget .windRose {width: 80%;margin: 0 10%;}", 13)
-            styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 14)
-            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 4rem; width: 40%; margin: 5px 5%}", 15)
+            styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .windDirectionChart, #DataTableContainer{width: 100%!important; left: 0%;}", 10)
+            styleSheet.insertRule(".weatherHubWidget .windRose {width: 80%;margin: 0 10%;}", 11)
+            styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 12)
+            styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 4.5rem; width: 44%; margin: 4px 2%}", 13)
+            styleSheet.insertRule(".weatherHubWidget .dataBoxLayout {order: 4; width: 100%;}", 14)
+        }
+
+        if (this.innerContainer.offsetWidth < 576) {
+            this.setTimeSeriesNumberOfHours(9);
+        }
+        else {
+            this.setTimeSeriesNumberOfHours(24);
         }
     }
+
+    private setTimeSeriesNumberOfHours(numberOfHours: number) {
+        if (this.chartNumberOfHours == numberOfHours) {
+            return;
+        }
+
+        if (this.windDirectionChart) {
+            this.windDirectionChart.setDisplayNumberOfHours(numberOfHours);
+        }
+
+        if (this.windStrengthChart) {
+            this.windStrengthChart.setDisplayNumberOfHours(numberOfHours);
+        }
+
+        this.chartNumberOfHours = numberOfHours;
+    }
+
     private addSubWidgets() {
         this.innerContainer = document.createElement('div');
         this.innerContainer.classList.add('weatherHubWidget');
@@ -128,7 +157,7 @@ export default class WeatherHubWidget {
 
         this.widgetContainer.appendChild(this.innerContainer);
 
-        this.createStyleSheet();
+        this.handleResize();
     }
 
     private initialiseSubWidgets() {
@@ -151,7 +180,7 @@ export default class WeatherHubWidget {
             { y: 360, label: 'N' }
         ];
 
-        this.windDirectionChart = new TimeSeriesChart(this.windDirectionContainer, 24, windDirectionSeries, this.labelColor, false, windDirectionYAxisLabels);
+        this.windDirectionChart = new TimeSeriesChart(this.windDirectionContainer, this.chartNumberOfHours, windDirectionSeries, this.labelColor, false, windDirectionYAxisLabels);
 
         let windStrengthSeries: SeriesInfo[] = [
             {
@@ -164,7 +193,7 @@ export default class WeatherHubWidget {
             },
         ]
 
-        this.windStrengthChart = new TimeSeriesChart(this.windStrengthContainer, 24, windStrengthSeries, this.labelColor, true);
+        this.windStrengthChart = new TimeSeriesChart(this.windStrengthContainer, this.chartNumberOfHours, windStrengthSeries, this.labelColor, true);
 
         this.dataBoxLayout = new DataBoxLayout(this.dataBoxContainer, this.labelColor, this.valueColor);
     }
