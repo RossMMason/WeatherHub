@@ -20,6 +20,7 @@
     <None Remove="sample\index.html" />
     <None Remove="ts\DataBoxLayout.ts" />
     <None Remove="ts\DataLookup.ts" />
+    <None Remove="ts\StationUpdateHub.ts" />
     <None Remove="ts\TimeSeriesChart.ts" />
     <None Remove="ts\Types.ts" />
     <None Remove="ts\WeatherHubWidget.ts" />
@@ -249,6 +250,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="node_modules\svg.js\svg.js.d.ts" />
     <TypeScriptCompile Include="ts\DataLookup.ts" />
+    <TypeScriptCompile Include="ts\StationUpdateHub.ts" />
     <TypeScriptCompile Include="ts\TimeSeriesChart.ts" />
     <TypeScriptCompile Include="ts\Types.ts" />
     <TypeScriptCompile Include="ts\WeatherHubWidget.ts">

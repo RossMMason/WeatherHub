@@ -28,7 +28,6 @@ namespace WeatherHub.FrontEnd
 
     public class Startup
     {
-
         private const string WeatherHubCorsPolicyName = "WeatherHubCorsPolicy";
 
         public Startup(IConfiguration configuration)
