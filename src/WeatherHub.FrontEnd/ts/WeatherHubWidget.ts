@@ -73,10 +73,7 @@ export default class WeatherHubWidget {
     private listenForResize() {
         let widget = this;
         window.addEventListener("resize", function () {
-            widget.innerContainer
-            if (widget.windowWidth !== widget.innerContainer.offsetWidth) {
-                widget.debouncedHandleResize();
-            }
+            widget.debouncedHandleResize();
         });
     }
 
@@ -114,13 +111,13 @@ export default class WeatherHubWidget {
 
         alert(innerContainerWidth);
 
-        if (innerContainerWidth < 1227) {
+        if (innerContainerWidth< 1227) {
             console.log("InnerWidthIsUnder 1227");
             styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 5rem; width: 5.5rem; }", 7)
             styleSheet.insertRule(".weatherHubWidget .dataBox {font-size: 0.7rem; font-weight: 700;} ", 8)
         }
-
-        if (innerContainerWidth < 576) {
+        
+        if (innerContainerWidth< 576) {
             console.log("InnerWidthIsUnder 576");
             styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .windDirectionChart, #DataTableContainer{width: 100%!important; left: 0%;}", 9)
             styleSheet.insertRule(".weatherHubWidget .windRose {width: 80%;margin: 0 10%;}", 10)
@@ -129,7 +126,7 @@ export default class WeatherHubWidget {
             styleSheet.insertRule(".weatherHubWidget .dataBoxLayout {order: 4; width: 100%;}", 13)
         }
 
-        if (innerContainerWidth < 576) {
+        if (innerContainerWidth< 576) {
             this.setTimeSeriesNumberOfHours(9);
         }
         else {
