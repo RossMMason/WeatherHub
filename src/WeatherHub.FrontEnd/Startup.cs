@@ -48,7 +48,7 @@ namespace WeatherHub.FrontEnd
                     {
                         builder
                             .AllowAnyOrigin()
-                            .WithMethods(new string[] { "GET" });
+                            .AllowAnyMethod();
                     });
             });
             
