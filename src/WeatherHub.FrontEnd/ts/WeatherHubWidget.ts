@@ -81,6 +81,13 @@ export default class WeatherHubWidget {
     }
 
     private handleResize() {
+
+        if (this.windowWidth == window.innerWidth) {
+            return;
+        }
+
+        this.windowWidth = window.innerWidth;
+
         let prevStyles = document.getElementById("wh-styles");
 
         if (prevStyles) {
