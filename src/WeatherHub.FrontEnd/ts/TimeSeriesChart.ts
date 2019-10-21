@@ -24,10 +24,11 @@ export default class TimeSeriesChart {
     private container: HTMLElement;
 
     private viewBoxHeight = 250; 
-    private viewBoxWidth = 700;
+    private viewBoxWidth24HourWidth = 700;
     private viewBoxMinX = 0;
     private xPerMinute: number;
     private chartTotalMinutes: number;
+    private drawXAxisForPreviousHours: number = 24;
 
     private chartIntervals: ChartInterval[];
     private series: SeriesInfo[];
@@ -89,6 +90,10 @@ export default class TimeSeriesChart {
         this.scheduleNextViewBoxMove();
     }
 
+    private getViewBoxWidth(): number {
+        return this.viewBoxWidth24HourWidth / 24 * this.showHours;
+    }
+
     private scaleYAxis() {
         if (!this.autoScaleYAxis) {
             this.redrawYAxisTicksAndLabels();
@@ -98,7 +103,7 @@ export default class TimeSeriesChart {
 
         // Get maximum y within viewport
         let viewStartDate = this.getDateForXVal(this.viewBoxMinX);
-        let viewEndDate = this.getDateForXVal(this.viewBoxMinX + this.viewBoxWidth);
+        let viewEndDate = this.getDateForXVal(this.viewBoxMinX + this.getViewBoxWidth());
 
         let inViewSeriesData = this.seriesData.getBetweenDates(viewStartDate, viewEndDate);
 
@@ -151,9 +156,11 @@ export default class TimeSeriesChart {
         }
 
         if (this.seriesData.hasDataForDate(dataPoint.when)) {
-            // update dataPoint and redraw. 
-            // todo
+            let existingSeriesData = this.seriesData.getData(dataPoint.when);
+            existingSeriesData.seriesData = dataPoint.seriesData;
 
+            let graphics = this.renderDataPoint(dataPoint);
+            existingSeriesData.seriesGraphics = graphics;
         } else {
             let graphics = this.renderDataPoint(dataPoint);
 
@@ -169,6 +176,31 @@ export default class TimeSeriesChart {
         this.debouncedScaleYAxis();
     }
 
+    private reRenderDataPoints() {
+
+        let currentSeriesData = this.seriesData.getValues();
+
+        for (let s = 0; s < currentSeriesData.length; s++) {
+
+            let dataPoint: DataPoint = {
+                when: currentSeriesData[s].when,
+                seriesData: currentSeriesData[s].seriesData
+            }
+
+            this.addDataPoint(dataPoint);
+        }
+    }
+
+    public setDisplayNumberOfHours(numberOfHours: number) {
+        this.showHours = numberOfHours;
+        this.calculateKeyFigures();
+        this.render();
+        this.calculatedMaxY = undefined;
+        this.scaleYAxis();
+        this.redrawExistingIntervals();
+        this.reRenderDataPoints();
+    }
+
     private renderDataPoint(dataPoint: DataPoint): SeriesDatapointGraphics[] {
 
         let timeSeriesChart = this;
@@ -176,8 +208,6 @@ export default class TimeSeriesChart {
         let x = this.getXPosForDate(dataPoint.when);
 
         let gPoints = dataPoint.seriesData.map(function (seriesDataPoint, seriesIndex) {
-
-            
 
             let y = timeSeriesChart.getYUnitsForValue(seriesDataPoint);
 
@@ -233,8 +263,8 @@ export default class TimeSeriesChart {
     }
 
     private calculateKeyFigures() {
-        this.xPerMinute = this.viewBoxWidth / (this.showHours * 60);
-        this.chartTotalMinutes = this.showHours * 60;
+        this.xPerMinute = this.getViewBoxWidth() / (this.showHours * 60);
+        this.chartTotalMinutes = this.drawXAxisForPreviousHours * 60;
         this.zeroXDate = addHours(addMinutes(startOfMinute(new Date()), 1), -this.showHours);
 
         // At least 10 units per tick.
@@ -303,6 +333,13 @@ export default class TimeSeriesChart {
             currentDate = addMinutes(currentDate, 1);
         }
     }
+
+    private redrawExistingIntervals() {
+        for (let i = 0; i < this.chartIntervals.length; i++) {
+            this.drawXAxisTickAndLabel(this.chartIntervals[i].when);
+        }
+    }
+
 
     private getXPosForDate(date: Date) {
         return differenceInMinutes(date, this.zeroXDate) * this.xPerMinute;
@@ -438,11 +475,19 @@ export default class TimeSeriesChart {
     }
 
     private render() {
+        if (this.yAxisSvg) {
+            this.yAxisSvg.remove();
+        }
+
+        if (this.chartSvg) {
+            this.chartSvg.remove();
+        }
+
         this.yAxisSvg = document.createElementNS(svgns, 'svg');
         this.yAxisSvg.style.width = '100%';
         this.yAxisSvg.style.height = 'auto';
         this.yAxisSvg.style.position = 'absolute';
-        this.yAxisSvg.setAttributeNS(null, 'viewBox', '0 0 ' + this.viewBoxWidth + ' ' + this.viewBoxHeight);
+        this.yAxisSvg.setAttributeNS(null, 'viewBox', '0 0 ' + this.getViewBoxWidth() + ' ' + this.viewBoxHeight);
         this.yAxisSvg.style.width = '100%';
         this.yAxisSvg.style.height = 'auto';
         this.yAxisSvg.style.zIndex = '100';
@@ -468,7 +513,7 @@ export default class TimeSeriesChart {
         this.chartSvg.style.width = '100%';
         this.chartSvg.style.height = 'auto';
         this.chartSvg.style.position = 'relative';
-        this.chartSvg.setAttributeNS(null, 'viewBox', '0 0 ' + this.viewBoxWidth + ' ' + this.viewBoxHeight);
+        this.chartSvg.setAttributeNS(null, 'viewBox', '0 0 ' + this.getViewBoxWidth() + ' ' + this.viewBoxHeight);
         this.chartSvg.style.width = '100%';
         this.chartSvg.style.height = 'auto';
         this.container.appendChild(this.chartSvg);
@@ -498,7 +543,7 @@ export default class TimeSeriesChart {
         let currentEndDate = addMinutes(startOfMinute(new Date()), 1);
         let currentStartDate = addHours(currentEndDate, -this.showHours); 
         let xOffset = differenceInMinutes(currentStartDate, this.zeroXDate) * this.xPerMinute;
-        this.chartSvg.setAttributeNS(null, 'viewBox', xOffset.toString() + ' 0 ' + this.viewBoxWidth + ' ' + this.viewBoxHeight);
+        this.chartSvg.setAttributeNS(null, 'viewBox', xOffset.toString() + ' 0 ' + this.getViewBoxWidth() + ' ' + this.viewBoxHeight);
         this.scaleYAxis();
     }
 }
