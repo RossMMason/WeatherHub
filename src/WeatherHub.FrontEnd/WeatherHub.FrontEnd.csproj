@@ -20,6 +20,7 @@
     <None Remove="sample\index.html" />
     <None Remove="ts\DataBoxLayout.ts" />
     <None Remove="ts\DataLookup.ts" />
+    <None Remove="ts\StationUpdateHub.ts" />
     <None Remove="ts\TimeSeriesChart.ts" />
     <None Remove="ts\Types.ts" />
     <None Remove="ts\WeatherHubWidget.ts" />
@@ -232,6 +233,7 @@
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
@@ -248,6 +250,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="node_modules\svg.js\svg.js.d.ts" />
     <TypeScriptCompile Include="ts\DataLookup.ts" />
+    <TypeScriptCompile Include="ts\StationUpdateHub.ts" />
     <TypeScriptCompile Include="ts\TimeSeriesChart.ts" />
     <TypeScriptCompile Include="ts\Types.ts" />
     <TypeScriptCompile Include="ts\WeatherHubWidget.ts">

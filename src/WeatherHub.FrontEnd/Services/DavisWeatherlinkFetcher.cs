@@ -9,11 +9,14 @@ namespace WeatherHub.FrontEnd.Services
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.SignalR;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
     using WeatherHub.Domain;
     using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
+    using WeatherHub.FrontEnd.Hubs;
     using WeatherHub.FrontEnd.Models;
     using WeatherHub.FrontEnd.Models.Weatherlink;
 
@@ -25,21 +28,25 @@ namespace WeatherHub.FrontEnd.Services
         private readonly FetcherSetting _apiToken;
         private readonly int _pickupPeriod;
         private readonly TimeZoneInfo _timeZone;
-        private CancellationTokenSource _cancellationTokenSource;
+        private readonly ILogger _logger;
+        private readonly WeatherStation _weatherStation;
+        private readonly IDbContext _dbContext;
+        private readonly IStationReadingRepository _stationReadingRepository;
+        private readonly IStationDayStatisticsRepository _stationDayStatisticsRepository;
+        private readonly IHubContext<StationUpdateHub, IStationUpdateHub> _stationUpdateHub;
+        private readonly GroupNameGenerator _hubGroupNameGenerator;
+        private readonly TimeSpan _oneMinute = TimeSpan.FromMinutes(1);
 
-        private ILogger _logger;
-        private WeatherStation _weatherStation;
-        private IDbContext _dbContext;
-        private IStationReadingRepository _stationReadingRepository;
-        private IStationDayStatisticsRepository _stationDayStatisticsRepository;
-        private TimeSpan _oneMinute = TimeSpan.FromMinutes(1);
+        private CancellationTokenSource _cancellationTokenSource;
 
         public DavisWeatherlinkFetcher(
             ILogger<DavisWeatherlinkFetcher> logger,
             WeatherStation weatherStation,
             IDbContext dbContext,
             IStationReadingRepository stationReadingRepository,
-            IStationDayStatisticsRepository stationDayStatisticsRepository)
+            IStationDayStatisticsRepository stationDayStatisticsRepository,
+            IHubContext<StationUpdateHub, IStationUpdateHub> stationUpdateHub,
+            GroupNameGenerator hubGroupNameGenerator)
             : base(logger)
         {
             _logger = logger;
@@ -47,6 +54,8 @@ namespace WeatherHub.FrontEnd.Services
             _dbContext = dbContext;
             _stationReadingRepository = stationReadingRepository;
             _stationDayStatisticsRepository = stationDayStatisticsRepository;
+            _stationUpdateHub = stationUpdateHub;
+            _hubGroupNameGenerator = hubGroupNameGenerator;
 
             var user = _weatherStation.FetcherSettings.SingleOrDefault(x => x.Key == "User");
             var password = _weatherStation.FetcherSettings.SingleOrDefault(x => x.Key == "Password");
@@ -174,6 +183,12 @@ namespace WeatherHub.FrontEnd.Services
             if (latestReading == null || latestReading.When != receivedReading.When)
             {
                 _stationReadingRepository.Create(receivedReading);
+
+                await _stationUpdateHub
+               .Clients
+               .Group(_hubGroupNameGenerator.GetNewReadingGroupName(_weatherStation.Id))
+               .NewStationReading(_weatherStation.Id, receivedReading.ToStationReadingDto(_weatherStation.AltitudeM));
+
             }
 
             // Station Day Statistics
@@ -216,6 +231,18 @@ namespace WeatherHub.FrontEnd.Services
             }
 
             await _dbContext.SaveChangesAsync(_cancellationTokenSource.Token);
+
+            DateTime? lastRain = await _stationReadingRepository.FetchLastRainDateAsync(_weatherStation.Id);
+            StationStatisticsDto statisticsDto = new StationStatisticsDto
+            {
+                DayStatistics = latestDayStatistics.ToStationDayStatisticsDto(),
+                LastRain = lastRain
+            };
+
+            await _stationUpdateHub
+               .Clients
+               .Group(_hubGroupNameGenerator.GetNewStatisticsGroupName(_weatherStation.Id))
+               .UpdatedStationStatistics(_weatherStation.Id, statisticsDto);
         }
     }
 }
