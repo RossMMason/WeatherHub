@@ -48,10 +48,10 @@ namespace WeatherHub.FrontEnd
                     {
                         builder
                             .AllowAnyOrigin()
-                            .WithMethods(new string[] { "GET" });
+                            .AllowAnyMethod();
                     });
             });
-            
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsightsKey"]);
