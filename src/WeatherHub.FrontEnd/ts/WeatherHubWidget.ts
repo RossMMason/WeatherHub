@@ -60,10 +60,10 @@ export default class WeatherHubWidget {
         this.initialiseSubWidgets(); 
 
         this.loadInitialData();
-        //this.stationUpdateHub = new StationUpdateHub(weatherStationId, weatherHubServer);
+        this.stationUpdateHub = new StationUpdateHub(weatherStationId, weatherHubServer);
 
-        //this.stationUpdateHub.onNewReading(this.newStationReading.bind(this));
-        //this.stationUpdateHub.onStatisticsUpdated(this.statisticsUpdated.bind(this));
+        this.stationUpdateHub.onNewReading(this.newStationReading.bind(this));
+        this.stationUpdateHub.onStatisticsUpdated(this.statisticsUpdated.bind(this));
 
         this.debouncedHandleResize = debounce(this.handleResize, 250);
 
