@@ -142,7 +142,7 @@ export default class WeatherHubWidget {
                 this.setTimeSeriesNumberOfHours(24);
             
         }
-    }s
+    }
 
     private setTimeSeriesNumberOfHours(numberOfHours: number) {
         if (this.chartNumberOfHours == numberOfHours) {
