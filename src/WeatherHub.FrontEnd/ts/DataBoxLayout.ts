@@ -66,7 +66,7 @@ export default class DataBoxLayout {
 
         this.temperature = new DataBox<number>(
             this.dataTable,
-            'Temperature',
+            'Temp',
             function (value: number) {
                 return Math.round(value).toString() + ' &deg;C';
             });
@@ -108,21 +108,21 @@ export default class DataBoxLayout {
             this.dataTable,
             'Humidity',
             function (value: number) {
-                return Math.round(value).toString() + '%';
+                return Math.round(value).toString() + ' %';
             });
 
         this.pressure = new DataBox<number>(
             this.dataTable,
             'Pressure',
             function (value: number) {
-                return Math.round(value).toString() + 'mb';
+                return Math.round(value).toString() + ' mb';
             });
 
         this.dewPoint = new DataBox<number>(
             this.dataTable,
             'Dewpoint',
             function (value: number) {
-                return Math.round(value).toString() + '&deg;C';
+                return Math.round(value).toString() + ' &deg;C';
             });
 
         this.container.appendChild(this.dataTable);

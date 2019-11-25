@@ -29,6 +29,8 @@ export default class TimeSeriesChart {
     private xPerMinute: number;
     private chartTotalMinutes: number;
     private drawXAxisForPreviousHours: number = 24;
+    private yAxisTitle: string | null;
+    private yAxisTitleElement: SVGElement;
 
     private chartIntervals: ChartInterval[];
     private series: SeriesInfo[];
@@ -40,7 +42,7 @@ export default class TimeSeriesChart {
     private dateLabelHeight = 14;
     private timeLabelHeight = 14;
     private xAxisTickHeight = 10;
-    private yAxisLabelWidth = 18;
+    private yAxisLabelWidth = 25;
     private yAxisTickWidth = 5;
     private yPaddingTop = 10;
     private minorXTickY1: number;
@@ -73,11 +75,13 @@ export default class TimeSeriesChart {
         series: SeriesInfo[],
         tickColor: string,
         autoScaleYAxis: boolean,
+        yAxisTitle: string | null,
         yAxisLabels?: YAxisLabel[]) {
         this.debouncedScaleYAxis = debounce(this.scaleYAxis, 100);
         this.seriesData = new DataLookup<SeriesData>();
         this.autoScaleYAxis = autoScaleYAxis;
         this.yAxisLabels = yAxisLabels;
+        this.yAxisTitle = yAxisTitle;
         this.container = container;
         this.showHours = showHours;
         this.series = series;
@@ -340,7 +344,6 @@ export default class TimeSeriesChart {
         }
     }
 
-
     private getXPosForDate(date: Date) {
         return differenceInMinutes(date, this.zeroXDate) * this.xPerMinute;
     }
@@ -397,12 +400,35 @@ export default class TimeSeriesChart {
             this.yAxisSvgLabels.forEach(function (label) { label.remove(); })
         }
 
+        if (this.yAxisTitle) {
+            if (this.yAxisTitleElement) {
+                this.yAxisTitleElement.remove();
+            }
+
+            this.createYAxisTitle();    
+        }
+
         if (this.yAxisLabels && this.yAxisLabels.length > 0) {
             this.drawYAxisFromSuppliedLables();
             return;
         }
 
         this.drawYAxisBasedOnInViewData();
+    }
+
+    private createYAxisTitle() {
+        let xPos = 6.5;
+        let yPos = ((this.viewBoxHeight - (this.viewBoxHeight - this.yZeroPosition)) / 2);
+
+        this.yAxisTitleElement = document.createElementNS(svgns, 'text') as SVGElement;
+        this.yAxisTitleElement.setAttribute('x', xPos.toString());
+        this.yAxisTitleElement.setAttribute('y', yPos.toString());
+        this.yAxisTitleElement.setAttribute('text-anchor', 'middle');
+        this.yAxisTitleElement.setAttribute('dominant-baseline', 'middle');
+        this.yAxisTitleElement.innerHTML = this.yAxisTitle;
+        this.yAxisTitleElement.setAttribute('style', 'font: 9px sans-serif; fill: ' + '#aaaaaa' + '; font-weight:bold');
+        this.yAxisTitleElement.setAttribute('transform', 'rotate(-90,' + xPos.toString() + ',' + yPos.toString() + ')');
+        this.yAxisSvg.appendChild(this.yAxisTitleElement);
     }
 
     private getYPosForValue(value: number) {
@@ -440,8 +466,6 @@ export default class TimeSeriesChart {
         this.yPixelsPerUnit = (this.viewBoxHeight - (this.viewBoxHeight - this.yZeroPosition) - this.yPaddingTop) / maxY;
 
         for (let i = 0; i < labels.length; i++) {
-
-            //let yPos = this.yZeroPosition - (this.yAxisLabels[i].y * this.yPixelsPerUnit);
             let yPos = this.getYPosForValue(labels[i].y);
 
             let tick = document.createElementNS(svgns, 'line') as SVGLineElement;
@@ -468,7 +492,7 @@ export default class TimeSeriesChart {
             label.setAttribute('text-anchor', 'end');
             label.setAttribute('dominant-baseline', 'middle');
             label.innerHTML = labels[i].label;
-            label.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + '; font-weight:bold');
+            label.setAttribute('style', 'font: 9px sans-serif; fill: ' + this.labelColor + '; font-weight:bold');
             this.yAxisSvg.appendChild(label);
             this.yAxisSvgLabels.push(label);
         }
@@ -498,7 +522,7 @@ export default class TimeSeriesChart {
         yAxisBg.setAttribute('y', '0');
         yAxisBg.setAttribute('width', this.yAxisXPos.toString());
         yAxisBg.setAttribute('height', this.viewBoxHeight.toString());
-        yAxisBg.setAttribute('style', 'fill:#ffffff;fill-opacity:0.5;stroke-width:0');
+        yAxisBg.setAttribute('style', 'fill:#ffffff;fill-opacity:0.82;stroke-width:0');
         this.yAxisSvg.appendChild(yAxisBg);
 
         let yAxis = document.createElementNS(svgns, 'line') as SVGLineElement;

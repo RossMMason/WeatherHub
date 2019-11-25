@@ -99,7 +99,7 @@ export default class WeatherHubWidget {
         var styleSheet = style.sheet as CSSStyleSheet
         styleSheet.insertRule(".weatherHubWidget div{box-sizing: border-box;}", 0)
         styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .weatherHubWidget .windDirectionChart {width: 68%; display: block; position: relative!important; margin: 0 4%;}", 1)
-        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding: 0.4rem; color: #27AAE1;}", 2)
+        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding-top:1rem;  color: #27AAE1;}", 2)
         styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxValue {display: block; text-align: center; width: 100%;} ", 3)
         styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; margin-left:4%; display: block; position: relative!important; color: black;}", 4)
         styleSheet.insertRule(".weatherHubWidget .dataBox {display:inline-flex; flex-wrap: wrap; margin: 1%; height: 6rem; width: 48%; font-family: sans-serif; font-weight: 700; font-size: 1rem; border-radius: 5px; border: solid 1px #ACACAC; }", 5);
@@ -128,18 +128,31 @@ export default class WeatherHubWidget {
         else {
             if (innerContainerWidth < 1645) {
                 styleSheet.insertRule(".weatherHubWidget .dataBox {height: 4.8rem; font-weight: 700; font-size: 0.95rem;}", 7);
+                styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {padding-top:0.9rem;}", 8);
             }
             if (innerContainerWidth < 1350) {
-                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 4.2rem; font-weight: 650; font-size: 0.9rem;}", 8);
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 4.2rem; font-weight: 650; font-size: 0.9rem;}", 9);
+                styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {padding-top:0.9rem;}", 10);
             }
             if (innerContainerWidth < 1254) {
-                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 4rem; font-weight: 650; font-size: 0.8rem;}", 9);
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 4rem; font-weight: 650; font-size: 0.8rem;}", 11);
+                styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {padding-top:0.8rem;}", 12);
             }
             if (innerContainerWidth < 1160) {
-                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 3.5rem; font-weight: 630; font-size: 0.7rem;}", 10);
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 3.5rem; font-weight: 630; font-size: 0.7rem;}", 13);
+                styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {padding-top:0.7rem;}", 14);
             }
             if (innerContainerWidth < 1050) {
-                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 3.2rem; font-weight: 630; font-size: 0.6rem;}", 11);
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 3.2rem; font-weight: 630; font-size: 0.6rem;}", 15);
+                styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {padding-top:0.6rem;}", 16);
+            }
+            if (innerContainerWidth < 900) {
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 3.15rem; font-weight: 630; font-size: 0.57rem;}", 17);
+                styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {padding-top:0.5rem;}", 18);
+            }
+            if (innerContainerWidth < 800) {
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 2.8rem; font-weight: 630; font-size: 0.45rem;}", 19);
+                styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {padding-top:0.4rem;}", 20);
             }
             this.setTimeSeriesNumberOfHours(24);
         }
@@ -212,7 +225,7 @@ export default class WeatherHubWidget {
             { y: 360, label: 'N' }
         ];
 
-        this.windDirectionChart = new TimeSeriesChart(this.windDirectionContainer, this.chartNumberOfHours, windDirectionSeries, this.labelColor, false, windDirectionYAxisLabels);
+        this.windDirectionChart = new TimeSeriesChart(this.windDirectionContainer, this.chartNumberOfHours, windDirectionSeries, this.labelColor, false, 'wind origin', windDirectionYAxisLabels);
 
         let windStrengthSeries: SeriesInfo[] = [
             {
@@ -225,7 +238,7 @@ export default class WeatherHubWidget {
             },
         ]
 
-        this.windStrengthChart = new TimeSeriesChart(this.windStrengthContainer, this.chartNumberOfHours, windStrengthSeries, this.labelColor, true);
+        this.windStrengthChart = new TimeSeriesChart(this.windStrengthContainer, this.chartNumberOfHours, windStrengthSeries, this.labelColor, true, 'wind avg / gust (mph)');
 
         this.dataBoxLayout = new DataBoxLayout(this.dataBoxContainer, this.labelColor, this.valueColor);
     }
