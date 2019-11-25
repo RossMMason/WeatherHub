@@ -174,17 +174,18 @@ export default class WeatherHubWidget {
         this.windRoseContainer.classList.add('windRose');
         this.innerContainer.appendChild(this.windRoseContainer);
 
-        this.windDirectionContainer = document.createElement("div") as HTMLDivElement;
-        this.windDirectionContainer.classList.add("windDirectionChart")
-        this.innerContainer.appendChild(this.windDirectionContainer);
-
-        this.dataBoxContainer = document.createElement("div") as HTMLDivElement;
-        this.dataBoxContainer.classList.add("dataBoxLayout")
-
-        this.innerContainer.appendChild(this.dataBoxContainer);
+        
         this.windStrengthContainer = document.createElement("div") as HTMLDivElement;
         this.windStrengthContainer.classList.add("windStrengthChart")
         this.innerContainer.appendChild(this.windStrengthContainer);
+
+        this.dataBoxContainer = document.createElement("div") as HTMLDivElement;
+        this.dataBoxContainer.classList.add("dataBoxLayout")
+        this.innerContainer.appendChild(this.dataBoxContainer);
+
+        this.windDirectionContainer = document.createElement("div") as HTMLDivElement;
+        this.windDirectionContainer.classList.add("windDirectionChart")
+        this.innerContainer.appendChild(this.windDirectionContainer);
 
         this.widgetContainer.appendChild(this.innerContainer);
 
