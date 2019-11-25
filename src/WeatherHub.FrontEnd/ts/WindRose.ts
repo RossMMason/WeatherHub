@@ -12,7 +12,9 @@ export default class WindRose {
     private gustWindColour: string;
 
     private avgWindSpeedElement: SVGTextElement;
+    private avgWindSpeedLabel: SVGTextElement;
     private gustWindSpeedElement: SVGTextElement;
+    private gustWindSpeedLabel: SVGTextElement;
     private windDirectionElement: SVGTextElement;
 
     private currentPos = 0;
@@ -99,27 +101,47 @@ export default class WindRose {
 
     private drawCentreLabels() {
 
+        let labelSize = Math.round(this.renderSize / 24);
         let avgWindSpeedSize = Math.round(this.renderSize / 12);
         let maxWindSpeedSize = Math.round(this.renderSize / 12);
         let directionSize = Math.round(this.renderSize / 20);
 
-        let yOffsett = ((directionSize * 1.3) + (avgWindSpeedSize * 1.3)) / 2; 
+        let speedOffset = ((directionSize * 1.3) + (avgWindSpeedSize * 1.3)) / 2; 
+        let speedLabelOffset = ((directionSize * 1.3) + (avgWindSpeedSize * 1.3) + (labelSize * 0.5) / 2);
 
         this.avgWindSpeedElement = document.createElementNS(svgns, 'text') as SVGTextElement;
         this.avgWindSpeedElement.setAttribute('style', 'font: bold ' + avgWindSpeedSize.toString() + 'px sans-serif; fill: ' + this.avgWindColour + ';');
         this.avgWindSpeedElement.setAttribute('x', this.centre.toString());
-        this.avgWindSpeedElement.setAttribute('y', (this.centre - yOffsett).toString());
+        this.avgWindSpeedElement.setAttribute('y', (this.centre - speedOffset).toString());
         this.avgWindSpeedElement.setAttribute('text-anchor', 'middle');
         this.avgWindSpeedElement.setAttribute('dominant-baseline', 'middle');
         this.svg.appendChild(this.avgWindSpeedElement);
 
+        this.avgWindSpeedLabel = document.createElementNS(svgns, 'text') as SVGTextElement;
+        this.avgWindSpeedLabel.setAttribute('style', 'font: bold ' + labelSize.toString() + 'px sans-serif; fill: ' + this.avgWindColour + ';');
+        this.avgWindSpeedLabel.setAttribute('x', this.centre.toString());
+        this.avgWindSpeedLabel.setAttribute('y', (this.centre - speedLabelOffset).toString());
+        this.avgWindSpeedLabel.setAttribute('text-anchor', 'middle');
+        this.avgWindSpeedLabel.setAttribute('dominant-baseline', 'middle');
+        this.avgWindSpeedLabel.innerHTML = "AVG";
+        this.svg.appendChild(this.avgWindSpeedLabel);
+
         this.gustWindSpeedElement = document.createElementNS(svgns, 'text') as SVGTextElement;
         this.gustWindSpeedElement.setAttribute('style', 'font: bold ' + maxWindSpeedSize.toString() + 'px sans-serif; fill: ' + this.gustWindColour + ';');
         this.gustWindSpeedElement.setAttribute('x', this.centre.toString());
-        this.gustWindSpeedElement.setAttribute('y', (this.centre + yOffsett).toString());
+        this.gustWindSpeedElement.setAttribute('y', (this.centre + speedOffset).toString());
         this.gustWindSpeedElement.setAttribute('text-anchor', 'middle');
         this.gustWindSpeedElement.setAttribute('dominant-baseline', 'middle');
         this.svg.appendChild(this.gustWindSpeedElement);
+
+        this.gustWindSpeedLabel = document.createElementNS(svgns, 'text') as SVGTextElement;
+        this.gustWindSpeedLabel.setAttribute('style', 'font: bold ' + labelSize.toString() + 'px sans-serif; fill: ' + this.gustWindColour + ';');
+        this.gustWindSpeedLabel.setAttribute('x', this.centre.toString());
+        this.gustWindSpeedLabel.setAttribute('y', (this.centre + speedLabelOffset).toString());
+        this.gustWindSpeedLabel.setAttribute('text-anchor', 'middle');
+        this.gustWindSpeedLabel.setAttribute('dominant-baseline', 'middle');
+        this.gustWindSpeedLabel.innerHTML = "GUST";
+        this.svg.appendChild(this.gustWindSpeedLabel);
 
         this.windDirectionElement = document.createElementNS(svgns, 'text') as SVGTextElement;
         this.windDirectionElement.setAttribute('style', 'font: bold ' + directionSize.toString() + 'px sans-serif; fill: ' + this.labelColor + ';');
