@@ -1,5 +1,5 @@
 ﻿import * as signalR from "@aspnet/signalr";
-import { StationReadingDto, StationStatisticsDto } from "./Types";
+import { StationReadingDto, StationStatisticsDto, } from "./Types";
 
 
 export default class StationUpdateHub {

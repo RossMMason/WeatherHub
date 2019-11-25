@@ -98,37 +98,26 @@ export default class WeatherHubWidget {
         document.head.appendChild(style);
         var styleSheet = style.sheet as CSSStyleSheet
         styleSheet.insertRule(".weatherHubWidget div{box-sizing: border-box;}", 0)
-        styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .weatherHubWidget .windDirectionChart {width: 70%; display: block; position: relative!important; margin: 0 5%;}", 1)
-
-
+        styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .weatherHubWidget .windDirectionChart {width: 68%; display: block; position: relative!important; margin: 0 4%;}", 1)
         styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding: 0.4rem; color: #27AAE1;}", 2)
-
-        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxValue {display: block; text-align: center; width: 100%; font-size: 0.8rem;} ", 3)
-
-        styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; display: block; position: relative!important; color: black;}", 4)
-        styleSheet.insertRule(".weatherHubWidget .dataBox {display:inline-flex; flex-wrap: wrap; margin: 0.5rem; min-height: 6rem;width: 10rem; font-family: sans-serif; font-weight: 800; font-size: 1rem; border-radius: 5px; border: solid 1px #ACACAC; }", 5);
+        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxValue {display: block; text-align: center; width: 100%;} ", 3)
+        styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; margin-left:4%; display: block; position: relative!important; color: black;}", 4)
+        styleSheet.insertRule(".weatherHubWidget .dataBox {display:inline-flex; flex-wrap: wrap; margin: 1%; height: 6rem; width: 48%; font-family: sans-serif; font-weight: 700; font-size: 1rem; border-radius: 5px; border: solid 1px #ACACAC; }", 5);
         styleSheet.insertRule(".weatherHubWidget .dataBox {background: #DCE0E2;}", 6);
 
         let innerContainerWidth = this.innerContainer.offsetWidth / window.devicePixelRatio;
-        let innerContainerheight = this.innerContainer.offsetHeight / window.devicePixelRatio;
+        let innerContainerHeight = this.innerContainer.offsetHeight / window.devicePixelRatio;
+
+        console.log('whw-resize: ' + innerContainerWidth.toString() + '*' + innerContainerHeight.toString());
 
         if (this.windowWidth < this.windowHeight) {
-            console.log("HightBigger W:" + this.windowWidth + "H:" + this.windowHeight);
             if (innerContainerWidth < 1227) {
-                console.log("InnerWidthIsUnder 1227");
-                styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 5rem; width: 5.5rem; }", 7)
-                styleSheet.insertRule(".weatherHubWidget .dataBox {font-size: 0.7rem; font-weight: 700;} ", 8)
+                styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .windDirectionChart, #DataTableContainer{width: 100%!important; left: 0%;}", 7)
+                styleSheet.insertRule(".weatherHubWidget .windRose {width: 80%;margin: 0 10%;}", 8)
+                styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 9)
+                styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 4.5rem; width: 44%; margin: 4px 2%}", 10)
+                styleSheet.insertRule(".weatherHubWidget .dataBoxLayout {order: 4; width: 100%;}", 11)
             }
-
-            if (innerContainerWidth < 576) {
-                console.log("InnerWidthIsUnder 576");
-                styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .windDirectionChart, #DataTableContainer{width: 100%!important; left: 0%;}", 9)
-                styleSheet.insertRule(".weatherHubWidget .windRose {width: 80%;margin: 0 10%;}", 10)
-                styleSheet.insertRule(".weatherHubWidget .windStrengthChart {width: 100%;}", 11)
-                styleSheet.insertRule(".weatherHubWidget .dataBox {min-height: 4.5rem; width: 44%; margin: 4px 2%}", 12)
-                styleSheet.insertRule(".weatherHubWidget .dataBoxLayout {order: 4; width: 100%;}", 13)
-            }
-
             if (innerContainerWidth < 576) {
                 this.setTimeSeriesNumberOfHours(9);
             }
@@ -137,10 +126,22 @@ export default class WeatherHubWidget {
             }
         }
         else {
-            console.log("HightSmaller");
-
-                this.setTimeSeriesNumberOfHours(24);
-            
+            if (innerContainerWidth < 1645) {
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 4.8rem; font-weight: 700; font-size: 0.95rem;}", 7);
+            }
+            if (innerContainerWidth < 1350) {
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 4.2rem; font-weight: 650; font-size: 0.9rem;}", 8);
+            }
+            if (innerContainerWidth < 1254) {
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 4rem; font-weight: 650; font-size: 0.8rem;}", 9);
+            }
+            if (innerContainerWidth < 1160) {
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 3.5rem; font-weight: 630; font-size: 0.7rem;}", 10);
+            }
+            if (innerContainerWidth < 1050) {
+                styleSheet.insertRule(".weatherHubWidget .dataBox {height: 3.2rem; font-weight: 630; font-size: 0.6rem;}", 11);
+            }
+            this.setTimeSeriesNumberOfHours(24);
         }
     }
 

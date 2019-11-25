@@ -47,8 +47,10 @@ namespace WeatherHub.FrontEnd
                     builder =>
                     {
                         builder
-                            .AllowAnyOrigin()
-                            .AllowAnyMethod();
+                            .SetIsOriginAllowed((domain) => true)
+                            .AllowCredentials()
+                            .AllowAnyMethod().
+                            AllowAnyHeader();
                     });
             });
 

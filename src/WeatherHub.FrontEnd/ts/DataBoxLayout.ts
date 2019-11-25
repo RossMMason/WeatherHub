@@ -99,7 +99,7 @@ export default class DataBoxLayout {
 
         this.windHigh = new DataBox<WindHigh>(
             this.dataTable,
-            'Wind High Today',
+            'Wind High',
             function (value: WindHigh) {
                 return Math.round(value.windSpeed).toString() + ' mph @ ' + format(value.when, 'HH:mm');
             });
