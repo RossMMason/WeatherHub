@@ -89,16 +89,23 @@
 </head>
 <body>
 
-    <div id="TestWeatherWidget">
 
-
+    <div id="unsupported-browser-message" style="display:none">
+        <p>Your browser is not support. Please use a modern browser to see the weather widget. We recommend Chrome.</p>
+    </div>
+    <div id="weather-widget">
     </div>
 
     <script>
-        var weatherHubWidget = new weatherHub.WeatherHubWidget(
-            'https://dsc-weather.i-clients.co.uk',
-            '30D5F2BB-D444-4FDE-9C0A-97AD88C95CE0',
-            document.getElementById('TestWeatherWidget'));
+        if (weatherHub) {
+            var weatherHubWidget = new weatherHub.WeatherHubWidget(
+                'https://dsc-weather.i-clients.co.uk',
+                '30D5F2BB-D444-4FDE-9C0A-97AD88C95CE0',
+                document.getElementById('weather-widget'));
+        }
+        else {
+            document.getElementById("unsupported-browser-message").style.display = 'block';
+        }
     </script>
 </body>
 </html>
