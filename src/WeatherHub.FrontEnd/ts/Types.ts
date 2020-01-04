@@ -6,10 +6,11 @@ export type WindUnits = 'mph' | 'kph' | 'kts';
 export type TemperatureUnits = 'c' | 'f';
 
 export interface WidgetSettings {
-    primaryColor?: string,
-    secondaryColor?: string,
-    windUnits?: WindUnits,
-    temperatureUnits?: TemperatureUnits
+    primaryColor: string,
+    secondaryColor: string,
+    labelColor: string,
+    windUnits: WindUnits,
+    temperatureUnits: TemperatureUnits
 }
 
 export interface StationReading extends TimeIndexed  {

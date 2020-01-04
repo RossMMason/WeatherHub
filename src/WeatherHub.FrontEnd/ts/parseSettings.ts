@@ -1,9 +1,12 @@
 ﻿import { WidgetSettings } from "./Types"
 
 export const parseSettings = (settings: any) => {
+
+    // Defaults
     let parsedSettings: WidgetSettings = {
         primaryColor: '#27AAE1',
         secondaryColor: '#F03153',
+        labelColor: '#000000',
         windUnits: 'mph',
         temperatureUnits: 'c'
     }
@@ -25,6 +28,15 @@ export const parseSettings = (settings: any) => {
             parsedSettings.secondaryColor = settings.secondaryColor
         } else {
             console.warn('Incorrect secondary color provided. Using default value.')
+        }
+    }
+
+    if (settings.labelColor) {
+        if (isString(settings.labelColor)
+            && colorRegex.test(settings.labelColor)) {
+            parsedSettings.labelColor = settings.labelColor
+        } else {
+            console.warn('Incorrect label color provided. Using default value.')
         }
     }
 

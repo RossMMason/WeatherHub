@@ -24,10 +24,6 @@ export default class WeatherHubWidget {
 
     private widgetSettings: WidgetSettings;
 
-    private labelColor = "#000000";
-    private valueColor = "#27AAE1";
-    private avgWindColor = "#27AAE1";
-    private gustColor = "#F03153" 
     private hoursOfDataToLoadOnStart = 48;
 
     private windRose: WindRose;
@@ -105,9 +101,9 @@ export default class WeatherHubWidget {
         var styleSheet = style.sheet as CSSStyleSheet
         styleSheet.insertRule(".weatherHubWidget div{box-sizing: border-box;}", 0)
         styleSheet.insertRule(".weatherHubWidget .windStrengthChart, .weatherHubWidget .windDirectionChart {width: 68%; display: block; position: relative!important; margin: 0 4%;}", 1)
-        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding-top:1rem;  color: #27AAE1;}", 2)
+        styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxTitle {display: block; text-align: center; width: 100%; padding-top:1rem;  color: " + this.widgetSettings.primaryColor + ";}", 2)
         styleSheet.insertRule(".weatherHubWidget .dataBox .dataBoxValue {display: block; text-align: center; width: 100%;} ", 3)
-        styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; margin-left:4%; display: block; position: relative!important; color: black;}", 4)
+        styleSheet.insertRule(".weatherHubWidget .windRose, .weatherHubWidget .dataBoxLayout {width: 20%; margin-left:4%; display: block; position: relative!important; color: " + this.widgetSettings.labelColor + ";}", 4)
         styleSheet.insertRule(".weatherHubWidget .dataBox {display:inline-flex; flex-wrap: wrap; margin: 1%; height: 6rem; width: 48%; font-family: sans-serif; font-weight: 700; font-size: 1rem; border-radius: 5px; border: solid 1px #ACACAC; }", 5);
         styleSheet.insertRule(".weatherHubWidget .dataBox {background: #DCE0E2;}", 6);
 
@@ -212,11 +208,17 @@ export default class WeatherHubWidget {
     }
 
     private initialiseSubWidgets() {
-        this.windRose = new WindRose(this.windRoseContainer, this.labelColor, this.labelColor, this.labelColor, this.avgWindColor, this.gustColor);
+        this.windRose = new WindRose(
+            this.windRoseContainer,
+            this.widgetSettings.labelColor,
+            this.widgetSettings.labelColor,
+            this.widgetSettings.labelColor,
+            this.widgetSettings.primaryColor,
+            this.widgetSettings.secondaryColor);
 
         let windDirectionSeries: SeriesInfo[] = [
             {
-                color: this.avgWindColor,
+                color: this.widgetSettings.primaryColor,
                 label: '10 Min Avg Wind (mph)'
             }];
 
@@ -231,22 +233,38 @@ export default class WeatherHubWidget {
             { y: 360, label: 'N' }
         ];
 
-        this.windDirectionChart = new TimeSeriesChart(this.windDirectionContainer, this.chartNumberOfHours, windDirectionSeries, this.labelColor, false, 'wind origin', windDirectionYAxisLabels);
+        this.windDirectionChart = new TimeSeriesChart(
+            this.windDirectionContainer,
+            this.chartNumberOfHours,
+            windDirectionSeries,
+            this.widgetSettings.labelColor,
+            false,
+            'wind origin',
+            windDirectionYAxisLabels);
 
         let windStrengthSeries: SeriesInfo[] = [
             {
-                color: this.avgWindColor,
+                color: this.widgetSettings.primaryColor,
                 label: '10 Min Avg Wind (mph)'
             },
             {
-                color: this.gustColor,
+                color: this.widgetSettings.secondaryColor,
                 label: '10 Min Max Gust (mph)'
             },
         ]
 
-        this.windStrengthChart = new TimeSeriesChart(this.windStrengthContainer, this.chartNumberOfHours, windStrengthSeries, this.labelColor, true, 'wind avg / gust (mph)');
+        this.windStrengthChart = new TimeSeriesChart(
+            this.windStrengthContainer,
+            this.chartNumberOfHours,
+            windStrengthSeries,
+            this.widgetSettings.labelColor,
+            true,
+            'wind avg / gust (mph)');
 
-        this.dataBoxLayout = new DataBoxLayout(this.dataBoxContainer, this.labelColor, this.valueColor);
+        this.dataBoxLayout = new DataBoxLayout(
+            this.dataBoxContainer,
+            this.widgetSettings.labelColor,
+            this.widgetSettings.primaryColor);
     }
 
     private loadInitialData() {
