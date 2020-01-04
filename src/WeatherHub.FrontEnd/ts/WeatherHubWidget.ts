@@ -4,11 +4,12 @@ import DataBoxLayout from './DataBoxLayout';
 import DataLookup from './DataLookup';
 import StationUpdateHub from './StationUpdateHub';
 import axios from 'axios';
-import { StationReading, StationReadingDto, StationStatisticsDto, StationStatistics, DtoConverter } from './Types';
+import { StationReading, StationReadingDto, StationStatisticsDto, StationStatistics, DtoConverter, WidgetSettings, WindUnits, TemperatureUnits } from './Types';
 import {
     addHours, format, parse
 } from 'date-fns';
 import { debounce } from 'ts-debounce';
+import { parseSettings } from './parseSettings';
 
 export default class WeatherHubWidget {
      
@@ -20,6 +21,8 @@ export default class WeatherHubWidget {
 
     private innerContainer: HTMLDivElement;
     private windRoseContainer: HTMLDivElement;
+
+    private widgetSettings: WidgetSettings;
 
     private labelColor = "#000000";
     private valueColor = "#27AAE1";
@@ -47,10 +50,13 @@ export default class WeatherHubWidget {
     constructor(
         weatherHubServer: string,
         weatherStationId: string,
-        widgetContainer: HTMLElement) { 
+        widgetContainer: HTMLElement,
+        widgetSettings?: any) { 
         this.weatherStationId = weatherStationId;
         this.weatherHubServer = weatherHubServer;
         this.widgetContainer = widgetContainer;
+
+        this.widgetSettings = parseSettings(widgetSettings);
 
         this.dtoConverter = new DtoConverter();
 
