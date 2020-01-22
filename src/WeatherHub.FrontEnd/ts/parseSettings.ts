@@ -65,7 +65,7 @@ export const parseSettings = (settings: any) => {
                 parsedSettings.temperatureUnits = 'f';
                 break;
             default:
-                console.warn('Incorrect temperature  units provided. Using default value.')
+                console.warn('Incorrect temperature units provided. Using default value.')
         }
     }
 

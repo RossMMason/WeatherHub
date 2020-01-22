@@ -224,7 +224,7 @@ export default class WeatherHubWidget {
         let windDirectionSeries: SeriesInfo[] = [
             {
                 color: this.widgetSettings.primaryColor,
-                label: '10 Min Avg Wind (mph)'
+                label: '15 Min Avg Wind (mph)'
             }];
 
         let windDirectionYAxisLabels: YAxisLabel[] = [
@@ -250,11 +250,11 @@ export default class WeatherHubWidget {
         let windStrengthSeries: SeriesInfo[] = [
             {
                 color: this.widgetSettings.primaryColor,
-                label: '10 Min Avg Wind (mph)'
+                label: '15 Min Avg Wind (mph)'
             },
             {
                 color: this.widgetSettings.secondaryColor,
-                label: '10 Min Max Gust (mph)'
+                label: '15 Min Max Gust (mph)'
             },
         ]
 
