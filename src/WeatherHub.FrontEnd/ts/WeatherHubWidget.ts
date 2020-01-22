@@ -10,6 +10,7 @@ import {
 } from 'date-fns';
 import { debounce } from 'ts-debounce';
 import { parseSettings } from './parseSettings';
+import UnitConverter from './UnitConverter';
 
 export default class WeatherHubWidget {
      
@@ -42,6 +43,7 @@ export default class WeatherHubWidget {
     private stationUpdateHub: StationUpdateHub;
 
     private dtoConverter: DtoConverter;
+    private unitConverter: UnitConverter;
 
     constructor(
         weatherHubServer: string,
@@ -53,6 +55,9 @@ export default class WeatherHubWidget {
         this.widgetContainer = widgetContainer;
 
         this.widgetSettings = parseSettings(widgetSettings);
+        this.unitConverter = new UnitConverter(
+            this.widgetSettings.windUnits,
+            this.widgetSettings.temperatureUnits);
 
         this.dtoConverter = new DtoConverter();
 
