@@ -59,6 +59,6 @@ export default class StationUpdateHub {
     private statisticsUpdated(stationId: string, statistics: StationStatisticsDto) {
         for (let i = 0; i < this.statisticsUpdatedCallbacks.length; i++) {
             this.statisticsUpdatedCallbacks[i](statistics);
-        }
+        } 
     }
 }

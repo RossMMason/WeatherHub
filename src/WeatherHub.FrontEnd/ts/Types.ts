@@ -3,7 +3,7 @@
 } from 'date-fns';
 
 export type WindUnits = 'mph' | 'kph' | 'kts';
-export type TemperatureUnits = 'c' | 'f';
+export type TemperatureUnits = 'C' | 'F';
 
 export interface WidgetSettings {
     primaryColor: string,

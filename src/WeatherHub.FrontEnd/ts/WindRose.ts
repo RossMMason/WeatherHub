@@ -24,6 +24,7 @@ export default class WindRose {
     private tickColor: string;
     private arrowColor: string;
     private labelColor: string;
+    private windUnitLabel: string;
 
     private debouncedMoveToPosition: (degrees: number) => void;
 
@@ -35,7 +36,8 @@ export default class WindRose {
         arrowColor: string, 
         labelColor: string,
         avgWindColour: string,
-        gustWindColour: string
+        gustWindColour: string,
+        windUnitLabel: string
     ) {
 
         this.debouncedMoveToPosition = debounce(this.moveToPosition, 100);
@@ -45,6 +47,7 @@ export default class WindRose {
         this.labelColor = labelColor;
         this.avgWindColour = avgWindColour;
         this.gustWindColour = gustWindColour;
+        this.windUnitLabel = windUnitLabel;
 
         this.setKeyPoints();
         this.render();
@@ -60,8 +63,8 @@ export default class WindRose {
     }
 
     private updateLabels(windDegrees: number, avgWindSpeed: number, gustWindSpeed: number) {
-        this.avgWindSpeedElement.innerHTML = Math.round(avgWindSpeed).toString() + ' mph';
-        this.gustWindSpeedElement.innerHTML = Math.round(gustWindSpeed).toString() + ' mph';
+        this.avgWindSpeedElement.innerHTML = Math.round(avgWindSpeed).toString() + ' ' + this.windUnitLabel;
+        this.gustWindSpeedElement.innerHTML = Math.round(gustWindSpeed).toString() + ' ' + this.windUnitLabel;
         this.windDirectionElement.innerHTML = Math.round(windDegrees).toString() + '&deg;';
     }
 

@@ -8,7 +8,7 @@ export const parseSettings = (settings: any) => {
         secondaryColor: '#F03153',
         labelColor: '#000000',
         windUnits: 'mph',
-        temperatureUnits: 'c'
+        temperatureUnits: 'C'
     }
 
     let colorRegex = /^#([0-9A-F]{3}|[0-9A-F]{6})$/ig.compile();
@@ -58,11 +58,11 @@ export const parseSettings = (settings: any) => {
 
     if (settings.temperatureUnits) {
         switch (settings.temperatureUnits) {
-            case 'c':
-                parsedSettings.temperatureUnits = 'c';
+            case 'C':
+                parsedSettings.temperatureUnits = 'C';
                 break;
-            case 'f':
-                parsedSettings.temperatureUnits = 'f';
+            case 'F':
+                parsedSettings.temperatureUnits = 'F';
                 break;
             default:
                 console.warn('Incorrect temperature units provided. Using default value.')

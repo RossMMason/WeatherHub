@@ -19,19 +19,26 @@ export default class DataBoxLayout {
     private pressure: DataBox<number>;
     private dewPoint: DataBox<number>;
 
+    private windUnitsLabel: string;
+    private temperatureUnitsLabel: string;
+
     constructor(
         container: HTMLDivElement,
         labelColor: string,
-        valueColor: string
+        valueColor: string, 
+        windUnitLabel: string, 
+        temperatureUnitLabel: string,
     ) {
         this.container = container;
         this.labelColor = labelColor;
         this.valueColor = valueColor;
+        this.windUnitsLabel = windUnitLabel;
+        this.temperatureUnitsLabel = temperatureUnitLabel;
         this.render();
     }
 
-    public updateTemperature(tempC: number) {
-        this.temperature.updateValue(tempC);
+    public updateTemperature(temp: number) {
+        this.temperature.updateValue(temp);
     }
 
     public updateEstimatedCloudBase(estimatedCloubaseFt: number) {
@@ -67,21 +74,21 @@ export default class DataBoxLayout {
         this.temperature = new DataBox<number>(
             this.dataTable,
             'Temp',
-            function (value: number) {
-                return Math.round(value).toString() + ' &deg;C';
+            (value: number) => {
+                return Math.round(value).toString() + ' ' + this.temperatureUnitsLabel;
             });
 
         this.estimatedCloudbase = new DataBox<number>(
             this.dataTable,
             'Est. CBase',
-            function (value: number) {
+            (value: number) => {
                 return Math.round(value).toString() + ' ft';
             });
 
         this.rainToday = new DataBox<number>(
             this.dataTable,
             'Rain Today',
-            function (value: number) {
+            (value: number) => {
                 return Math.round(value).toString() + ' mm';
             });
 
@@ -100,29 +107,29 @@ export default class DataBoxLayout {
         this.windHigh = new DataBox<WindHigh>(
             this.dataTable,
             'Wind High',
-            function (value: WindHigh) {
-                return Math.round(value.windSpeed).toString() + ' mph @ ' + format(value.when, 'HH:mm');
+            (value: WindHigh) => {
+                return Math.round(value.windSpeed).toString() + ' ' + this.windUnitsLabel + ' @ ' + format(value.when, 'HH:mm');
             });
 
         this.humidity = new DataBox<number>(
             this.dataTable,
             'Humidity',
-            function (value: number) {
+            (value: number) => {
                 return Math.round(value).toString() + ' %';
             });
 
         this.pressure = new DataBox<number>(
             this.dataTable,
             'Pressure',
-            function (value: number) {
+            (value: number) => {
                 return Math.round(value).toString() + ' mb';
             });
 
         this.dewPoint = new DataBox<number>(
             this.dataTable,
             'Dewpoint',
-            function (value: number) {
-                return Math.round(value).toString() + ' &deg;C';
+            (value: number) => {
+                return Math.round(value).toString() + ' ' + this.temperatureUnitsLabel;
             });
 
         this.container.appendChild(this.dataTable);

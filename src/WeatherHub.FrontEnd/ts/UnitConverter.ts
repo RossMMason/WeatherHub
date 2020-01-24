@@ -35,9 +35,9 @@ export default class UnitConverter {
 
     public getConvertedTemperature(temperatureInC: number) {
         switch (this.temperatureUnits) {
-            case 'c':
+            case 'C':
                 return temperatureInC;
-            case 'f':
+            case 'F':
                 return temperatureInC * 1.8 + 32;
             default:
                 throw 'Unsupported temperature units.';
