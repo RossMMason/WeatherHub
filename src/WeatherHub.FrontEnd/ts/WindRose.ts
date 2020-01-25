@@ -1,5 +1,6 @@
 ﻿const svgns = 'http://www.w3.org/2000/svg';
 import { debounce } from 'ts-debounce';
+import UnitConverter from './UnitConverter';
 
 export default class WindRose {
     private container: HTMLDivElement;
@@ -24,6 +25,7 @@ export default class WindRose {
     private tickColor: string;
     private arrowColor: string;
     private labelColor: string;
+    private unitConverter: UnitConverter;
 
     private debouncedMoveToPosition: (degrees: number) => void;
 
@@ -35,7 +37,8 @@ export default class WindRose {
         arrowColor: string, 
         labelColor: string,
         avgWindColour: string,
-        gustWindColour: string
+        gustWindColour: string,
+        unitConverter: UnitConverter
     ) {
 
         this.debouncedMoveToPosition = debounce(this.moveToPosition, 100);
@@ -45,6 +48,7 @@ export default class WindRose {
         this.labelColor = labelColor;
         this.avgWindColour = avgWindColour;
         this.gustWindColour = gustWindColour;
+        this.unitConverter = unitConverter;
 
         this.setKeyPoints();
         this.render();
@@ -52,16 +56,19 @@ export default class WindRose {
 
     public displayNewDataPoint(when: Date, windDegrees: number, avgWindSpeed: number, gustWindSpeed) {
 
+        let convertedAvgWindSpeed = this.unitConverter.getConvertedWindSpeed(avgWindSpeed);
+        let convertedGustWindSpeed = this.unitConverter.getConvertedWindSpeed(gustWindSpeed);
+
         if (!this.mostRecentReading || this.mostRecentReading < when) {
             this.debouncedMoveToPosition(windDegrees);
-            this.updateLabels(windDegrees, avgWindSpeed, gustWindSpeed);
+            this.updateLabels(windDegrees, convertedAvgWindSpeed, convertedGustWindSpeed);
             this.mostRecentReading = when;
         }
     }
 
     private updateLabels(windDegrees: number, avgWindSpeed: number, gustWindSpeed: number) {
-        this.avgWindSpeedElement.innerHTML = Math.round(avgWindSpeed).toString() + ' mph';
-        this.gustWindSpeedElement.innerHTML = Math.round(gustWindSpeed).toString() + ' mph';
+        this.avgWindSpeedElement.innerHTML = Math.round(avgWindSpeed).toString() + ' ' + this.unitConverter.getWindUnitsLabel();
+        this.gustWindSpeedElement.innerHTML = Math.round(gustWindSpeed).toString() + ' ' + this.unitConverter.getWindUnitsLabel();
         this.windDirectionElement.innerHTML = Math.round(windDegrees).toString() + '&deg;';
     }
 
@@ -112,7 +119,7 @@ export default class WindRose {
         this.gustWindSpeedElement = document.createElementNS(svgns, 'text') as SVGTextElement;
         this.gustWindSpeedElement.setAttribute('style', 'font: bold ' + maxWindSpeedSize.toString() + 'px sans-serif; fill: ' + this.gustWindColour + ';');
         this.gustWindSpeedElement.setAttribute('x', this.centre.toString());
-        this.gustWindSpeedElement.setAttribute('y', (this.centre - speedOffset).toString());
+        this.gustWindSpeedElement.setAttribute('y', (this.centre + speedOffset).toString());
         this.gustWindSpeedElement.setAttribute('text-anchor', 'middle');
         this.gustWindSpeedElement.setAttribute('dominant-baseline', 'middle');
         this.svg.appendChild(this.gustWindSpeedElement);
@@ -120,7 +127,7 @@ export default class WindRose {
         this.gustWindSpeedLabel = document.createElementNS(svgns, 'text') as SVGTextElement;
         this.gustWindSpeedLabel.setAttribute('style', 'font: bold ' + labelSize.toString() + 'px sans-serif; fill: ' + this.gustWindColour + ';');
         this.gustWindSpeedLabel.setAttribute('x', this.centre.toString());
-        this.gustWindSpeedLabel.setAttribute('y', (this.centre - speedLabelOffset).toString());
+        this.gustWindSpeedLabel.setAttribute('y', (this.centre + speedLabelOffset).toString());
         this.gustWindSpeedLabel.setAttribute('text-anchor', 'middle');
         this.gustWindSpeedLabel.setAttribute('dominant-baseline', 'middle');
         this.gustWindSpeedLabel.innerHTML = "GUST";
@@ -129,7 +136,7 @@ export default class WindRose {
         this.avgWindSpeedElement = document.createElementNS(svgns, 'text') as SVGTextElement;
         this.avgWindSpeedElement.setAttribute('style', 'font: bold ' + avgWindSpeedSize.toString() + 'px sans-serif; fill: ' + this.avgWindColour + ';');
         this.avgWindSpeedElement.setAttribute('x', this.centre.toString());
-        this.avgWindSpeedElement.setAttribute('y', (this.centre + speedOffset).toString());
+        this.avgWindSpeedElement.setAttribute('y', (this.centre - speedOffset).toString());
         this.avgWindSpeedElement.setAttribute('text-anchor', 'middle');
         this.avgWindSpeedElement.setAttribute('dominant-baseline', 'middle');
         this.svg.appendChild(this.avgWindSpeedElement);
@@ -137,7 +144,7 @@ export default class WindRose {
         this.avgWindSpeedLabel = document.createElementNS(svgns, 'text') as SVGTextElement;
         this.avgWindSpeedLabel.setAttribute('style', 'font: bold ' + labelSize.toString() + 'px sans-serif; fill: ' + this.avgWindColour + ';');
         this.avgWindSpeedLabel.setAttribute('x', this.centre.toString());
-        this.avgWindSpeedLabel.setAttribute('y', (this.centre + speedLabelOffset).toString());
+        this.avgWindSpeedLabel.setAttribute('y', (this.centre - speedLabelOffset).toString());
         this.avgWindSpeedLabel.setAttribute('text-anchor', 'middle');
         this.avgWindSpeedLabel.setAttribute('dominant-baseline', 'middle');
         this.avgWindSpeedLabel.innerHTML = "AVG";

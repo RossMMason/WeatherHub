@@ -11,6 +11,7 @@
 } from 'date-fns';
 import DataLookup from './DataLookup';
 import { debounce } from 'ts-debounce';
+import UnitConverter from './UnitConverter';
 
 const svgns = 'http://www.w3.org/2000/svg';
 
@@ -68,7 +69,6 @@ export default class TimeSeriesChart {
     private calculatedMaxY: number;
     private calculatedTickInterval: number;
 
-
     constructor(
         container: HTMLElement,
         showHours: number,
@@ -121,6 +121,8 @@ export default class TimeSeriesChart {
             }
         }
 
+        thisMaxY = Math.ceil(thisMaxY);
+
         while (thisMaxY % 10 !== 0) {
             thisMaxY++;
         }
@@ -159,6 +161,21 @@ export default class TimeSeriesChart {
             throw ('Wrong number of series datapoints!');
         }
 
+        /*let convertedSeriesData = dataPoint.seriesData.map((value, index) => {
+            if (this.series[index].unitConverter) {
+                return this.series[index].unitConverter(value);
+            }
+            return value;
+        });
+
+        dataPoint.seriesData = convertedSeriesData;*/
+
+        for (let i = 0; i < dataPoint.seriesData.length; i++) {
+            if (this.series[i].unitConverter) {
+                dataPoint.seriesData[i] = this.series[i].unitConverter(dataPoint.seriesData[i]);
+            }
+        }
+
         if (this.seriesData.hasDataForDate(dataPoint.when)) {
             let existingSeriesData = this.seriesData.getData(dataPoint.when);
             existingSeriesData.seriesData = dataPoint.seriesData;
@@ -181,7 +198,6 @@ export default class TimeSeriesChart {
     }
 
     private reRenderDataPoints() {
-
         let currentSeriesData = this.seriesData.getValues();
 
         for (let s = 0; s < currentSeriesData.length; s++) {
@@ -585,6 +601,7 @@ type ChartDataPoint = {
 export type SeriesInfo = {
     color: string; 
     label: string;
+    unitConverter?: (datapoint: number) => number;
 }
 
 export type YAxisLabel = {

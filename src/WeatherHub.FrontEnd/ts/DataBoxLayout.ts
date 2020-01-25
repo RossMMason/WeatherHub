@@ -3,6 +3,7 @@ import { debounce } from 'ts-debounce';
 import {
     format,
 } from 'date-fns';
+import UnitConverter from './UnitConverter';
 
 export default class DataBoxLayout {
 
@@ -19,19 +20,25 @@ export default class DataBoxLayout {
     private pressure: DataBox<number>;
     private dewPoint: DataBox<number>;
 
+
+
+    private unitConverter: UnitConverter;
+
     constructor(
         container: HTMLDivElement,
         labelColor: string,
-        valueColor: string
+        valueColor: string, 
+        unitConverter: UnitConverter,
     ) {
         this.container = container;
         this.labelColor = labelColor;
         this.valueColor = valueColor;
+        this.unitConverter = unitConverter;
         this.render();
     }
 
-    public updateTemperature(tempC: number) {
-        this.temperature.updateValue(tempC);
+    public updateTemperature(temp: number) {
+        this.temperature.updateValue(temp);
     }
 
     public updateEstimatedCloudBase(estimatedCloubaseFt: number) {
@@ -67,21 +74,23 @@ export default class DataBoxLayout {
         this.temperature = new DataBox<number>(
             this.dataTable,
             'Temp',
-            function (value: number) {
-                return Math.round(value).toString() + ' &deg;C';
+            (value: number) => {
+                return Math.round(this.unitConverter.getConvertedTemperature(value)).toString()
+                    + ' '
+                    + this.unitConverter.getTemperatureUnitsLabel();
             });
 
         this.estimatedCloudbase = new DataBox<number>(
             this.dataTable,
             'Est. CBase',
-            function (value: number) {
+            (value: number) => {
                 return Math.round(value).toString() + ' ft';
             });
 
         this.rainToday = new DataBox<number>(
             this.dataTable,
             'Rain Today',
-            function (value: number) {
+            (value: number) => {
                 return Math.round(value).toString() + ' mm';
             });
 
@@ -100,29 +109,35 @@ export default class DataBoxLayout {
         this.windHigh = new DataBox<WindHigh>(
             this.dataTable,
             'Wind High',
-            function (value: WindHigh) {
-                return Math.round(value.windSpeed).toString() + ' mph @ ' + format(value.when, 'HH:mm');
+            (value: WindHigh) => {
+                return Math.round(this.unitConverter.getConvertedWindSpeed(value.windSpeed)).toString()
+                    + ' '
+                    + this.unitConverter.getWindUnitsLabel()
+                    + ' @ '
+                    + format(value.when, 'HH:mm');
             });
 
         this.humidity = new DataBox<number>(
             this.dataTable,
             'Humidity',
-            function (value: number) {
+            (value: number) => {
                 return Math.round(value).toString() + ' %';
             });
 
         this.pressure = new DataBox<number>(
             this.dataTable,
             'Pressure',
-            function (value: number) {
+            (value: number) => {
                 return Math.round(value).toString() + ' mb';
             });
 
         this.dewPoint = new DataBox<number>(
             this.dataTable,
             'Dewpoint',
-            function (value: number) {
-                return Math.round(value).toString() + ' &deg;C';
+            (value: number) => {
+                return Math.round(this.unitConverter.getConvertedTemperature(value)).toString()
+                    + ' '
+                    + this.unitConverter.getTemperatureUnitsLabel();
             });
 
         this.container.appendChild(this.dataTable);
