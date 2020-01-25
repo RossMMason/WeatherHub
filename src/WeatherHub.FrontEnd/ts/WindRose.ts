@@ -1,5 +1,6 @@
 ﻿const svgns = 'http://www.w3.org/2000/svg';
 import { debounce } from 'ts-debounce';
+import UnitConverter from './UnitConverter';
 
 export default class WindRose {
     private container: HTMLDivElement;
@@ -24,7 +25,7 @@ export default class WindRose {
     private tickColor: string;
     private arrowColor: string;
     private labelColor: string;
-    private windUnitLabel: string;
+    private unitConverter: UnitConverter;
 
     private debouncedMoveToPosition: (degrees: number) => void;
 
@@ -37,7 +38,7 @@ export default class WindRose {
         labelColor: string,
         avgWindColour: string,
         gustWindColour: string,
-        windUnitLabel: string
+        unitConverter: UnitConverter
     ) {
 
         this.debouncedMoveToPosition = debounce(this.moveToPosition, 100);
@@ -47,7 +48,7 @@ export default class WindRose {
         this.labelColor = labelColor;
         this.avgWindColour = avgWindColour;
         this.gustWindColour = gustWindColour;
-        this.windUnitLabel = windUnitLabel;
+        this.unitConverter = unitConverter;
 
         this.setKeyPoints();
         this.render();
@@ -55,16 +56,19 @@ export default class WindRose {
 
     public displayNewDataPoint(when: Date, windDegrees: number, avgWindSpeed: number, gustWindSpeed) {
 
+        let convertedAvgWindSpeed = this.unitConverter.getConvertedWindSpeed(avgWindSpeed);
+        let convertedGustWindSpeed = this.unitConverter.getConvertedWindSpeed(gustWindSpeed);
+
         if (!this.mostRecentReading || this.mostRecentReading < when) {
             this.debouncedMoveToPosition(windDegrees);
-            this.updateLabels(windDegrees, avgWindSpeed, gustWindSpeed);
+            this.updateLabels(windDegrees, convertedAvgWindSpeed, convertedGustWindSpeed);
             this.mostRecentReading = when;
         }
     }
 
     private updateLabels(windDegrees: number, avgWindSpeed: number, gustWindSpeed: number) {
-        this.avgWindSpeedElement.innerHTML = Math.round(avgWindSpeed).toString() + ' ' + this.windUnitLabel;
-        this.gustWindSpeedElement.innerHTML = Math.round(gustWindSpeed).toString() + ' ' + this.windUnitLabel;
+        this.avgWindSpeedElement.innerHTML = Math.round(avgWindSpeed).toString() + ' ' + this.unitConverter.getWindUnitsLabel();
+        this.gustWindSpeedElement.innerHTML = Math.round(gustWindSpeed).toString() + ' ' + this.unitConverter.getWindUnitsLabel();
         this.windDirectionElement.innerHTML = Math.round(windDegrees).toString() + '&deg;';
     }
 

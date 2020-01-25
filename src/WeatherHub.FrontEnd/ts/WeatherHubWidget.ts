@@ -220,12 +220,13 @@ export default class WeatherHubWidget {
             this.widgetSettings.labelColor,
             this.widgetSettings.primaryColor,
             this.widgetSettings.secondaryColor,
-            this.unitConverter.getWindUnitsLabel());
+            this.unitConverter);
 
         let windDirectionSeries: SeriesInfo[] = [
             {
                 color: this.widgetSettings.primaryColor,
-                label: '15 Min Avg Wind (' + this.unitConverter.getWindUnitsLabel() + ')'
+                label: 'Wind Origin',
+                unitConverter: null
             }];
 
         let windDirectionYAxisLabels: YAxisLabel[] = [
@@ -251,11 +252,13 @@ export default class WeatherHubWidget {
         let windStrengthSeries: SeriesInfo[] = [
             {
                 color: this.widgetSettings.primaryColor,
-                label: '15 Min Avg Wind (' + this.unitConverter.getWindUnitsLabel() + ')'
+                label: '15 Min Avg Wind (' + this.unitConverter.getWindUnitsLabel() + ')',
+                unitConverter: (dataPoint) => { return this.unitConverter.getConvertedWindSpeed(dataPoint) }
             },
             {
                 color: this.widgetSettings.secondaryColor,
-                label: '15  Min Max Gust (' + this.unitConverter.getWindUnitsLabel() + ')'
+                label: '15  Min Max Gust (' + this.unitConverter.getWindUnitsLabel() + ')',
+                unitConverter: (dataPoint) => { return this.unitConverter.getConvertedWindSpeed(dataPoint) }
             },
         ]
 
@@ -271,8 +274,7 @@ export default class WeatherHubWidget {
             this.dataBoxContainer,
             this.widgetSettings.labelColor,
             this.widgetSettings.primaryColor,
-            this.unitConverter.getWindUnitsLabel(),
-            this.unitConverter.getTemperatureUnitsLabel());
+            this.unitConverter);
     }
 
     private loadInitialData() {
