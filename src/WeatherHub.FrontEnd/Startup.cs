@@ -9,7 +9,6 @@ namespace WeatherHub.FrontEnd
     using System.Linq;
     using System.Reflection;
     using Autofac;
-    using Autofac.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
@@ -18,6 +17,7 @@ namespace WeatherHub.FrontEnd
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using WeatherHub.Domain;
     using WeatherHub.Domain.Entities;
@@ -30,15 +30,18 @@ namespace WeatherHub.FrontEnd
     {
         private const string WeatherHubCorsPolicyName = "WeatherHubCorsPolicy";
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            Environment = env;
         }
 
         public IConfiguration Configuration { get; }
 
+        public IWebHostEnvironment Environment { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options =>
             {
@@ -54,22 +57,19 @@ namespace WeatherHub.FrontEnd
                     });
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsightsKey"]);
 
             services.AddHostedService<WeatherCollector>();
 
             services.AddSignalR();
-
-            var container = RegisterAutofacServices(services, Configuration);
-            return container.Resolve<IServiceProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, WeatherHubDbContext weatherHubDbContext)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            var contentRoot = env.ContentRootPath;
+            var contentRoot = Environment.ContentRootPath;
 
             using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
@@ -88,23 +88,23 @@ namespace WeatherHub.FrontEnd
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "widgets")),
                 RequestPath = "/widgets",
-                EnableDirectoryBrowsing = false
+                EnableDirectoryBrowsing = false,
             });
 
             app.UseFileServer(new FileServerOptions
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "sample")),
                 RequestPath = "/sample",
-                EnableDirectoryBrowsing = false
+                EnableDirectoryBrowsing = false,
             });
 
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseFileServer(new FileServerOptions
                 {
                     FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "ts")),
                     RequestPath = "/ts",
-                    EnableDirectoryBrowsing = false
+                    EnableDirectoryBrowsing = false,
                 });
 
                 app.UseDeveloperExceptionPage();
@@ -117,23 +117,21 @@ namespace WeatherHub.FrontEnd
 
             app.UseHttpsRedirection();
             app.UseCors(WeatherHubCorsPolicyName);
-            app.UseMvc();
-
-            app.UseSignalR(options =>
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
             {
-                options.MapHub<StationUpdateHub>("/hubs/station-update-hub");
-            });
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            loggerFactory.AddApplicationInsights(app.ApplicationServices, LogLevel.Warning);
+                endpoints.MapHub<StationUpdateHub>("/hubs/station-update-hub");
+            });
         }
 
-        private IContainer RegisterAutofacServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureContainer(ContainerBuilder builder)
         {
-            var builder = new ContainerBuilder();
-            builder.Populate(services);
-
             DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
-            dbContextOptionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WeatherHub.Domain.Migrations"));
+            dbContextOptionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WeatherHub.Domain.Migrations"));
 
             builder.RegisterType<WeatherHubDbContext>()
                 .AsImplementedInterfaces()
@@ -177,8 +175,6 @@ namespace WeatherHub.FrontEnd
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
-
-            return builder.Build();
         }
     }
 }

@@ -61,13 +61,13 @@ namespace WeatherHub.Domain
             modelBuilder
                .Entity<FetcherSetting>()
                .HasKey(x => x.Id)
-               .ForSqlServerIsClustered(false);
+               .IsClustered(false);
 
             modelBuilder
                 .Entity<FetcherSetting>()
                 .HasIndex("StationId", "Key")
                 .IsUnique()
-                .ForSqlServerIsClustered();
+                .IsClustered();
 
             modelBuilder
                 .Entity<FetcherSetting>()
@@ -112,13 +112,13 @@ namespace WeatherHub.Domain
             modelBuilder
                 .Entity<StationReading>()
                 .HasKey(x => x.Id)
-                .ForSqlServerIsClustered(false);
+                .IsClustered(false);
 
             modelBuilder
                 .Entity<StationReading>()
                 .HasIndex("StationId", "When")
                 .IsUnique()
-                .ForSqlServerIsClustered();
+                .IsClustered();
         }
 
         private void ConfigureStationDayStatistics(ModelBuilder modelBuilder)
@@ -126,13 +126,13 @@ namespace WeatherHub.Domain
             modelBuilder
                .Entity<StationDayStatistics>()
                .HasKey(x => x.Id)
-               .ForSqlServerIsClustered(false);
+               .IsClustered(false);
 
             modelBuilder
                 .Entity<StationDayStatistics>()
                 .HasIndex("StationId", "Date")
                 .IsUnique()
-                .ForSqlServerIsClustered();
+                .IsClustered();
 
             modelBuilder
                 .Entity<StationDayStatistics>()

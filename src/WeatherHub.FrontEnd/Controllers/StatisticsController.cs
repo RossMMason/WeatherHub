@@ -1,4 +1,4 @@
-﻿// <copyright file="DayStatisticsController.cs" company="Ross Mason">
+﻿// <copyright file="StatisticsController.cs" company="Ross Mason">
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 
@@ -48,7 +48,7 @@ namespace WeatherHub.FrontEnd.Controllers
             StationStatisticsDto dto = new StationStatisticsDto
             {
                 DayStatistics = stationDayStatistics.ToStationDayStatisticsDto(),
-                LastRain = lastRain
+                LastRain = lastRain,
             };
 
             return Ok(dto);

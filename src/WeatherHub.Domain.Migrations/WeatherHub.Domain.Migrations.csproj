@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <ApplicationIcon />
+    <TargetFramework>net5.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <StartupObject />
+    <Version Condition=" '$(Build_BuildNumber)' == '' ">0.0.0.1</Version>
+    <Version Condition=" '$(Build_BuildNumber)' != '' ">$(Build_BuildNumber)</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Development\Solutions\WeatherHub\src\WeatherHub.Domain.Migrations\WeatherHub.Domain.Migrations.xml</DocumentationFile>
+  <PropertyGroup>
     <NoWarn>1701;1702;1705;1591</NoWarn>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <DocumentationFile>$(MsBuildProjectDir)doc.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,10 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

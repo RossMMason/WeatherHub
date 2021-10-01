@@ -4,30 +4,52 @@
 
 namespace WeatherHub.FrontEnd
 {
-    using Microsoft.AspNetCore;
+    using Autofac.Extensions.DependencyInjection;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
 
     public class Program
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, configuration) =>
-                    {
-                        configuration.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
-                        configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
 
-                        if (hostingContext.HostingEnvironment.IsProduction())
+                    webBuilder.ConfigureAppConfiguration((hostingContext, configBuilder) =>
+                    {
+                        configBuilder.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
+
+                        configBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+                        if (hostingContext.HostingEnvironment.IsDevelopment())
                         {
-                            configuration.AddJsonFile("environmentSettings.Production.json", optional: true, reloadOnChange: true);
+                            configBuilder.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
                         }
-                    })
-                .UseApplicationInsights()
-                .UseStartup<Startup>();
+
+                        configBuilder.AddEnvironmentVariables();
+                    });
+
+                    webBuilder.ConfigureLogging((hostingContext, logging) =>
+                    {
+                        if (hostingContext.HostingEnvironment.EnvironmentName.Equals("Development", System.StringComparison.OrdinalIgnoreCase))
+                        {
+                            logging.AddConsole();
+                            logging.AddDebug();
+                        }
+                        else
+                        {
+                            logging.AddApplicationInsights(hostingContext.Configuration["ApplicationInsights:InstrumentationKey"]);
+                        }
+                    });
+                });
     }
 }

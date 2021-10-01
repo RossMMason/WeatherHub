@@ -33,7 +33,6 @@ namespace WeatherHub.FrontEnd.Controllers
         [HttpGet]
         public async Task<ActionResult<StationReadingDto>> Get(Guid weatherStationId)
         {
-
             WeatherStation weatherStation = await _weatherStationRepository.GetByIdAsync(weatherStationId);
 
             if (weatherStation == null)

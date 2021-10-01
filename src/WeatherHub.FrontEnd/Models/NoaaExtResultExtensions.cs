@@ -52,9 +52,9 @@ namespace WeatherHub.FrontEnd.Models
                 stationReading.WindDegrees = windDegrees;
             }
 
-            if (float.TryParse(noaaExtResult.WindMph, out float WindMph))
+            if (float.TryParse(noaaExtResult.WindMph, out float windMph))
             {
-                stationReading.WindMph = WindMph;
+                stationReading.WindMph = windMph;
             }
 
             if (noaaExtResult.CurrentObservation != null)

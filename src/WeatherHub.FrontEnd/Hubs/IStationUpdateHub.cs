@@ -1,4 +1,4 @@
-﻿// <copyright file="StationUpdateHub.cs" company="Ross Mason">
+﻿// <copyright file="IStationUpdateHub.cs" company="Ross Mason">
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 

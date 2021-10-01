@@ -12,7 +12,6 @@ namespace WeatherHub.FrontEnd.Services
     using Microsoft.AspNetCore.SignalR;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Serialization;
     using WeatherHub.Domain;
     using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
@@ -134,7 +133,7 @@ namespace WeatherHub.FrontEnd.Services
                 }
             }
 
-            // Also do an immidiate pickup to get the current data
+            // Also do an immediate pickup to get the current data
             ScheduleAddHockCollection(TimeSpan.FromTicks(1));
         }
 
@@ -188,7 +187,6 @@ namespace WeatherHub.FrontEnd.Services
                .Clients
                .Group(_hubGroupNameGenerator.GetNewReadingGroupName(_weatherStation.Id))
                .NewStationReading(_weatherStation.Id, receivedReading.ToStationReadingDto(_weatherStation.AltitudeM));
-
             }
 
             // Station Day Statistics
@@ -236,7 +234,7 @@ namespace WeatherHub.FrontEnd.Services
             StationStatisticsDto statisticsDto = new StationStatisticsDto
             {
                 DayStatistics = latestDayStatistics.ToStationDayStatisticsDto(),
-                LastRain = lastRain
+                LastRain = lastRain,
             };
 
             await _stationUpdateHub
