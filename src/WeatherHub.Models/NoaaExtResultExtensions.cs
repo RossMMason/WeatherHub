@@ -6,7 +6,7 @@ namespace WeatherHub.FrontEnd.Models
 {
     using System;
     using WeatherHub.Domain.Entities;
-    using WeatherHub.FrontEnd.Models.Weatherlink;
+    using WeatherHub.Models.Weatherlink;
 
     public static class NoaaExtResultExtensions
     {

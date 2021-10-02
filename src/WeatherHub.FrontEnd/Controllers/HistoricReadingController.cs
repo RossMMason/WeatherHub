@@ -12,7 +12,7 @@ namespace WeatherHub.FrontEnd.Controllers
     using Microsoft.Extensions.Logging;
     using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
-    using WeatherHub.FrontEnd.Models;
+    using WeatherHub.Models;
 
     [Route("weather/{weatherStationId}/historic-readings")]
     [ApiController]

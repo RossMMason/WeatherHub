@@ -2,7 +2,7 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace WeatherHub.FrontEnd.Hubs
+namespace WeatherHub.Functions.Hubs
 {
     using System;
     using System.Threading.Tasks;

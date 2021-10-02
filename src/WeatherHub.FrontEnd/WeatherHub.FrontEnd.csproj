@@ -84,6 +84,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WeatherHub.Domain.Migrations\WeatherHub.Domain.Migrations.csproj" />
     <ProjectReference Include="..\WeatherHub.Domain\WeatherHub.Domain.csproj" />
+    <ProjectReference Include="..\WeatherHub.Models\WeatherHub.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

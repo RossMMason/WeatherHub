@@ -5,13 +5,11 @@
 namespace WeatherHub.FrontEnd.Controllers
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
-    using WeatherHub.FrontEnd.Models;
+    using WeatherHub.Models;
 
     [Route("weather/{weatherStationId}/statistics")]
     [ApiController]

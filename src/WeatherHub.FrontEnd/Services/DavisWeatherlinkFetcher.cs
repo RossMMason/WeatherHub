@@ -17,7 +17,8 @@ namespace WeatherHub.FrontEnd.Services
     using WeatherHub.Domain.Repositories;
     using WeatherHub.FrontEnd.Hubs;
     using WeatherHub.FrontEnd.Models;
-    using WeatherHub.FrontEnd.Models.Weatherlink;
+    using WeatherHub.Models;
+    using WeatherHub.Models.Weatherlink;
 
     public class DavisWeatherlinkFetcher
         : TimerBasedWeatherDataFetcher

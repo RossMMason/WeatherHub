@@ -1,15 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.572
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherHub.FrontEnd", "WeatherHub.FrontEnd\WeatherHub.FrontEnd.csproj", "{B512854C-5472-4B1F-A5C3-809642D98C66}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DB", "DB", "{209E9D0C-507B-48FB-9787-EBD9B0FB9B18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Domain", "WeatherHub.Domain\WeatherHub.Domain.csproj", "{D2A5BB31-ACD1-4AF6-903C-060FAE2DE106}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherHub.Domain", "WeatherHub.Domain\WeatherHub.Domain.csproj", "{D2A5BB31-ACD1-4AF6-903C-060FAE2DE106}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Domain.Migrations", "WeatherHub.Domain.Migrations\WeatherHub.Domain.Migrations.csproj", "{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherHub.Domain.Migrations", "WeatherHub.Domain.Migrations\WeatherHub.Domain.Migrations.csproj", "{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Functions", "WeatherHub.Functions\WeatherHub.Functions.csproj", "{97FBFD9A-7F10-42B6-A839-30E96C481E8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Models", "WeatherHub.Models\WeatherHub.Models.csproj", "{090962EF-B96D-4EAE-B6ED-396C0BC48A1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +33,14 @@ Global
 		{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97FBFD9A-7F10-42B6-A839-30E96C481E8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97FBFD9A-7F10-42B6-A839-30E96C481E8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97FBFD9A-7F10-42B6-A839-30E96C481E8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97FBFD9A-7F10-42B6-A839-30E96C481E8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{090962EF-B96D-4EAE-B6ED-396C0BC48A1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{090962EF-B96D-4EAE-B6ED-396C0BC48A1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{090962EF-B96D-4EAE-B6ED-396C0BC48A1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{090962EF-B96D-4EAE-B6ED-396C0BC48A1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

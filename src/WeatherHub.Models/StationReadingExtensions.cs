@@ -2,10 +2,11 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace WeatherHub.FrontEnd.Models
+namespace WeatherHub.Models
 {
     using System;
     using WeatherHub.Domain.Entities;
+    using WeatherHub.FrontEnd.Models;
 
     public static class StationReadingExtensions
     {
