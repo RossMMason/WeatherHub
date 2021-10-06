@@ -12,15 +12,18 @@ namespace WeatherHub.Functions
 {
     public class QueueNextHoursCollections
     {
-        private ILogger<QueueNextHoursCollections> _logger;
-        private IWeatherStationRepository _weatherStationRepository;
+        private readonly ILogger<QueueNextHoursCollections> _logger;
+        private readonly IWeatherStationRepository _weatherStationRepository;
+        private readonly StorageQueueSettings _storageQueueSettings;
 
         public QueueNextHoursCollections(
             ILogger<QueueNextHoursCollections> logger,
-            IWeatherStationRepository weatherStationRepository)
+            IWeatherStationRepository weatherStationRepository, 
+            StorageQueueSettings storageQueueSettings)
         {
             _logger = logger;
             _weatherStationRepository = weatherStationRepository;
+            _storageQueueSettings = storageQueueSettings;
         }
 
         // Runs every hour on the hour and is responsible for queueing the next hours data collections
