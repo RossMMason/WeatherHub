@@ -32,6 +32,13 @@ namespace WeatherHub.Functions
                         .Where(x => ((TypeInfo)x).ImplementedInterfaces.Where(y => y.IsGenericType).Any(z => z.GetGenericTypeDefinition() == typeof(IRepository<>)));
 
 
+                    foreach (var repositoryType in repositoryTypes)
+                    {
+                        foreach (var interfaceType in repositoryType.GetInterfaces().Where(x => !x.IsGenericType))
+                        {
+                            services.AddScoped(interfaceType, repositoryType);
+                        }
+                    }
 
                     services.AddSingleton(f => new StorageQueueSettings
                     {

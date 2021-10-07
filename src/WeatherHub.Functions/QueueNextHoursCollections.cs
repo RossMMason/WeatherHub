@@ -40,7 +40,7 @@ namespace WeatherHub.Functions
                switch (weatherStation.FetcherType)
                {
                     case "DavisWeatherlinkFetcher":
-                        await QueueDavisNextHoursCollections(weatherStation, scheduledRunTime);
+                        await QueueDavisNextHoursCollections(weatherStation);
                         break;
                     default:
                         _logger.LogError($"Unrecognised fetcher type: '{weatherStation.FetcherType}'.");
@@ -53,7 +53,7 @@ namespace WeatherHub.Functions
 
         }
 
-        private async Task QueueDavisNextHoursCollections(WeatherStation weatherStation, DateTime scheduledRunTime)
+        private async Task QueueDavisNextHoursCollections(WeatherStation weatherStation)
         {
             var userSetting = weatherStation.FetcherSettings.SingleOrDefault(x => x.Key == "User");
             var passwordSetting = weatherStation.FetcherSettings.SingleOrDefault(x => x.Key == "Password");
@@ -93,7 +93,7 @@ namespace WeatherHub.Functions
 
             int pickupPeriod;
 
-            if (!int.TryParse(passwordSetting.Value, out pickupPeriod)
+            if (!int.TryParse(pickupPeriodSetting.Value, out pickupPeriod)
                 || pickupPeriod < 1
                 || pickupPeriod > 60)
             {
@@ -126,21 +126,33 @@ namespace WeatherHub.Functions
                 }
             }
 
-           // QueueClient queueClient = new(
-           //    string.Empty, // TODO connection string.
-           //    "davis-station-collections",
-           //    new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });
-            
+            // QueueClient queueClient = new(
+            //    string.Empty, // TODO connection string.
+            //    "davis-station-collections",
+            //    new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });
+
+            DateTime thisHour = new DateTime(
+                DateTime.UtcNow.Year,
+                DateTime.UtcNow.Month,
+                DateTime.UtcNow.Day,
+                DateTime.UtcNow.Hour,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc);
+
+
             foreach (var minutePastHour in minutesPastHour)
             {
-                DateTime fetchTime = scheduledRunTime.AddMinutes(minutePastHour);
-
-                TimeSpan fetchDelay = scheduledRunTime - DateTime.UtcNow;
+                DateTime fetchTime = thisHour.AddMinutes(minutePastHour);
+                TimeSpan fetchDelay = fetchTime - DateTime.UtcNow;
 
                 if (fetchDelay < TimeSpan.Zero)
                 {
-                    return;
+                    continue;
                 }
+
+                _logger.LogInformation($"Enqueued Davis weather data fetch for station '{weatherStation.Id}' for {fetchTime}.");
 
                 //await queueClient.SendMessageAsync(weatherStation.Id.ToString("D"), fetchDelay);
             }
