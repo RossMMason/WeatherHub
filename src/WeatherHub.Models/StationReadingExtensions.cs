@@ -2,19 +2,20 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace WeatherHub.FrontEnd.Models
+namespace WeatherHub.Models
 {
     using System;
     using WeatherHub.Domain.Entities;
+    using WeatherHub.FrontEnd.Models;
 
     public static class StationReadingExtensions
     {
         /// <summary>
         /// Returns station reading DTO to be used by clients.
-        /// Note: Cloudbase calculations taken from https://en.wikipedia.org/wiki/Cloud_base
+        /// Note: Cloudbase calculations taken from https://en.wikipedia.org/wiki/Cloud_base.
         /// </summary>
         /// <param name="stationReading">The station reading.</param>
-        /// <param name="stationHeightInM">The station height in M</param>
+        /// <param name="stationHeightInM">The station height in M.</param>
         /// <returns>Station reading Data Transfer Object.</returns>
         ///
         public static StationReadingDto ToStationReadingDto(this StationReading stationReading, float stationHeightInM)

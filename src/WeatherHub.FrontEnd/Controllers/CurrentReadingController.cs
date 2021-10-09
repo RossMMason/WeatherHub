@@ -10,7 +10,7 @@ namespace WeatherHub.FrontEnd.Controllers
     using Microsoft.Extensions.Logging;
     using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
-    using WeatherHub.FrontEnd.Models;
+    using WeatherHub.Models;
 
     [Route("weather/{weatherStationId}/current-reading")]
     [ApiController]
@@ -33,7 +33,6 @@ namespace WeatherHub.FrontEnd.Controllers
         [HttpGet]
         public async Task<ActionResult<StationReadingDto>> Get(Guid weatherStationId)
         {
-
             WeatherStation weatherStation = await _weatherStationRepository.GetByIdAsync(weatherStationId);
 
             if (weatherStation == null)

@@ -1,17 +1,15 @@
-﻿// <copyright file="DayStatisticsController.cs" company="Ross Mason">
+﻿// <copyright file="StatisticsController.cs" company="Ross Mason">
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 
 namespace WeatherHub.FrontEnd.Controllers
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
-    using WeatherHub.FrontEnd.Models;
+    using WeatherHub.Models;
 
     [Route("weather/{weatherStationId}/statistics")]
     [ApiController]
@@ -48,7 +46,7 @@ namespace WeatherHub.FrontEnd.Controllers
             StationStatisticsDto dto = new StationStatisticsDto
             {
                 DayStatistics = stationDayStatistics.ToStationDayStatisticsDto(),
-                LastRain = lastRain
+                LastRain = lastRain,
             };
 
             return Ok(dto);

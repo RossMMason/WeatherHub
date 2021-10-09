@@ -6,7 +6,7 @@ namespace WeatherHub.FrontEnd.Models
 {
     using System;
     using WeatherHub.Domain.Entities;
-    using WeatherHub.FrontEnd.Models.Weatherlink;
+    using WeatherHub.Models.Weatherlink;
 
     public static class NoaaExtResultExtensions
     {
@@ -52,9 +52,9 @@ namespace WeatherHub.FrontEnd.Models
                 stationReading.WindDegrees = windDegrees;
             }
 
-            if (float.TryParse(noaaExtResult.WindMph, out float WindMph))
+            if (float.TryParse(noaaExtResult.WindMph, out float windMph))
             {
-                stationReading.WindMph = WindMph;
+                stationReading.WindMph = windMph;
             }
 
             if (noaaExtResult.CurrentObservation != null)

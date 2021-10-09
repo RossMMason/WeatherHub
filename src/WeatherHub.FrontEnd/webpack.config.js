@@ -1,7 +1,5 @@
 ﻿const path = require("path");
-//  HtmlWebpackPlugin = require("html-webpack-plugin");
-const CleanWebpackPlugin = require("clean-webpack-plugin");
-// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+//const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 module.exports = {
     entry: './ts/index.ts',
@@ -25,19 +23,9 @@ module.exports = {
                 test: /\.ts$/,
                 use: "ts-loader"
             },
-            /*{
-                test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, "css-loader"]
-            }*/
         ]
     },
-    plugins: [
+    /*plugins: [
         new CleanWebpackPlugin(["wwwroot/js/*"]),
-        /*new HtmlWebpackPlugin({
-            template: "./src/index.html"
-        }),
-        new MiniCssExtractPlugin({
-            filename: "css/[name].[chunkhash].css"
-        })*/
-    ]
+    ]*/
 };

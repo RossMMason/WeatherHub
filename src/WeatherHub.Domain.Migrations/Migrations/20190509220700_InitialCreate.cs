@@ -23,7 +23,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     LocationDescriptionHtml = table.Column<string>(maxLength: 999999, nullable: true),
                     StationContact = table.Column<string>(maxLength: 50, nullable: true),
                     FetcherType = table.Column<string>(maxLength: 100, nullable: true),
-                    Version = table.Column<byte[]>(rowVersion: true, nullable: true)
+                    Version = table.Column<byte[]>(rowVersion: true, nullable: true),
                 },
                 constraints: table =>
                 {
@@ -37,7 +37,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     Id = table.Column<Guid>(nullable: false),
                     StationId = table.Column<Guid>(nullable: true),
                     Key = table.Column<string>(maxLength: 50, nullable: true),
-                    Value = table.Column<string>(maxLength: 500, nullable: true)
+                    Value = table.Column<string>(maxLength: 500, nullable: true),
                 },
                 constraints: table =>
                 {
@@ -82,7 +82,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     WindHighTime = table.Column<TimeSpan>(nullable: false),
                     WindChillLowC = table.Column<float>(nullable: false),
                     WindChillLowTime = table.Column<TimeSpan>(nullable: false),
-                    Version = table.Column<byte[]>(rowVersion: true, nullable: true)
+                    Version = table.Column<byte[]>(rowVersion: true, nullable: true),
                 },
                 constraints: table =>
                 {
@@ -113,7 +113,7 @@ namespace WeatherHub.Domain.Migrations.Migrations
                     WindGustMph = table.Column<float>(nullable: false),
                     WindChillC = table.Column<float>(nullable: false),
                     RainCmPerHour = table.Column<float>(nullable: false),
-                    Version = table.Column<byte[]>(rowVersion: true, nullable: true)
+                    Version = table.Column<byte[]>(rowVersion: true, nullable: true),
                 },
                 constraints: table =>
                 {

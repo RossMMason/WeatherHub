@@ -379,7 +379,7 @@ export default class TimeSeriesChart {
             dateLabel.setAttribute('y', this.dateCentreY.toString());
             dateLabel.setAttribute('text-anchor', 'middle');
             dateLabel.setAttribute('dominant-baseline', 'middle');
-            dateLabel.innerHTML = format(date, 'Do MMM YY')
+            dateLabel.innerHTML = format(date, 'Do MMM yy')
             dateLabel.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + ';font-weight: bold');
             this.chartSvg.appendChild(dateLabel);
         }

@@ -9,36 +9,38 @@ namespace WeatherHub.FrontEnd
     using System.Linq;
     using System.Reflection;
     using Autofac;
-    using Autofac.Extensions.DependencyInjection;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.SignalR;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using WeatherHub.Domain;
-    using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Migrations;
     using WeatherHub.Domain.Repositories;
+    using WeatherHub.FrontEnd.Authorization;
     using WeatherHub.FrontEnd.Hubs;
-    using WeatherHub.FrontEnd.Services;
 
     public class Startup
     {
         private const string WeatherHubCorsPolicyName = "WeatherHubCorsPolicy";
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            Environment = env;
         }
 
         public IConfiguration Configuration { get; }
 
+        public IWebHostEnvironment Environment { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options =>
             {
@@ -54,22 +56,31 @@ namespace WeatherHub.FrontEnd
                     });
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("SharedKeyAuthenticationRequirement", policy =>
+                {
+                    policy.Requirements.Add(new SharedKeyAuthenticationRequirement());
+                });
+            });
 
-            services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsightsKey"]);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            services.AddHostedService<WeatherCollector>();
-
-            services.AddSignalR();
-
-            var container = RegisterAutofacServices(services, Configuration);
-            return container.Resolve<IServiceProvider>();
+            if (Environment.IsDevelopment())
+            {
+                services.AddSignalR();
+            }
+            else
+            {
+                string signalRConnectionString = Configuration["SignalR:ConnectionString"];
+                services.AddSignalR().AddAzureSignalR(signalRConnectionString);
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, WeatherHubDbContext weatherHubDbContext)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            var contentRoot = env.ContentRootPath;
+            var contentRoot = Environment.ContentRootPath;
 
             using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
@@ -88,23 +99,23 @@ namespace WeatherHub.FrontEnd
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "widgets")),
                 RequestPath = "/widgets",
-                EnableDirectoryBrowsing = false
+                EnableDirectoryBrowsing = false,
             });
 
             app.UseFileServer(new FileServerOptions
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "sample")),
                 RequestPath = "/sample",
-                EnableDirectoryBrowsing = false
+                EnableDirectoryBrowsing = false,
             });
 
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseFileServer(new FileServerOptions
                 {
                     FileProvider = new PhysicalFileProvider(Path.Combine(contentRoot, "ts")),
                     RequestPath = "/ts",
-                    EnableDirectoryBrowsing = false
+                    EnableDirectoryBrowsing = false,
                 });
 
                 app.UseDeveloperExceptionPage();
@@ -117,23 +128,21 @@ namespace WeatherHub.FrontEnd
 
             app.UseHttpsRedirection();
             app.UseCors(WeatherHubCorsPolicyName);
-            app.UseMvc();
-
-            app.UseSignalR(options =>
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
             {
-                options.MapHub<StationUpdateHub>("/hubs/station-update-hub");
-            });
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            loggerFactory.AddApplicationInsights(app.ApplicationServices, LogLevel.Warning);
+                endpoints.MapHub<StationUpdateHub>("/hubs/station-update-hub");
+            });
         }
 
-        private IContainer RegisterAutofacServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureContainer(ContainerBuilder builder)
         {
-            var builder = new ContainerBuilder();
-            builder.Populate(services);
-
             DbContextOptionsBuilder dbContextOptionsBuilder = new DbContextOptionsBuilder();
-            dbContextOptionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WeatherHub.Domain.Migrations"));
+            dbContextOptionsBuilder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("WeatherHub.Domain.Migrations"));
 
             builder.RegisterType<WeatherHubDbContext>()
                 .AsImplementedInterfaces()
@@ -149,36 +158,17 @@ namespace WeatherHub.FrontEnd
             builder.RegisterType<GroupNameGenerator>()
                 .AsSelf();
 
-            builder.Register<Func<WeatherStation, IWeatherDataFetcher>>(c =>
-            {
-                var context = c.Resolve<IComponentContext>();
-
-                return (ws) =>
-                {
-                    switch (ws.FetcherType)
-                    {
-                        case "DavisWeatherlinkFetcher":
-                            return new DavisWeatherlinkFetcher(
-                                context.Resolve<ILogger<DavisWeatherlinkFetcher>>(),
-                                ws,
-                                context.Resolve<IDbContext>(),
-                                context.Resolve<IStationReadingRepository>(),
-                                context.Resolve<IStationDayStatisticsRepository>(),
-                                context.Resolve<IHubContext<StationUpdateHub, IStationUpdateHub>>(),
-                                context.Resolve<GroupNameGenerator>());
-                        default:
-                            throw new Exception($"Unsupported fetcher type: {ws.FetcherType}");
-                    }
-                };
-            });
-
             builder.RegisterAssemblyTypes(new[] { typeof(WeatherHub.Domain.WeatherHubDbContext).Assembly })
                 .Where(x => ((TypeInfo)x).ImplementedInterfaces.Where(y => y.IsGenericType).Any(z => z.GetGenericTypeDefinition() == typeof(IRepository<>)))
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-            return builder.Build();
+            builder.RegisterInstance(new SharedKeys { SignalRSharedKey = Configuration["SignalRSharedKey"] }).AsSelf();
+
+            builder.RegisterType<SharedKeyAuthenticationRequirementAuthorizationHandler>()
+                .As<IAuthorizationHandler>()
+                .InstancePerLifetimeScope();
         }
     }
 }

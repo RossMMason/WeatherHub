@@ -98,9 +98,8 @@ export default class DataBoxLayout {
             this.dataTable,
             'Last Rain',
             function (when: Date | null) {
-
                 if (when) {
-                    return format(when, 'DD MMM') + ' ' + format(when, 'HH:mm');
+                    return format(when, 'dd MMM') + ' ' + format(when, 'HH:mm');
                 } else {
                     '-';
                 }
