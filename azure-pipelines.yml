@@ -2,7 +2,7 @@ name: $(Date:yyyy).$(Date:MM).$(Date:dd).$(Rev:r)
 trigger:
  branches:
    include:
-     - main
+     - master
 
 pool:
   vmImage: 'windows-latest'
