@@ -7,6 +7,8 @@ namespace WeatherHub.FrontEnd.Hubs
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.SignalR;
+    using WeatherHub.FrontEnd.Authorization;
+    using WeatherHub.Models;
 
     public class StationUpdateHub : Hub<IStationUpdateHub>
     {
@@ -29,6 +31,21 @@ namespace WeatherHub.FrontEnd.Hubs
             await Groups.AddToGroupAsync(
                 Context.ConnectionId,
                 _groupNameGenerator.GetNewStatisticsGroupName(stationId));
+        }
+
+        [AuthenticateToken]
+        public async Task NewStationReading(Guid stationId, StationReadingDto stationReading)
+        {
+            await Clients.Group(_groupNameGenerator.GetNewReadingGroupName(stationId))
+                .NewStationReading(stationId, stationReading);
+        }
+
+        [AuthenticateToken]
+        public async Task UpdatedStationStatistics(Guid stationId, StationStatisticsDto stationStatistics)
+        {
+            await Clients
+               .Group(_groupNameGenerator.GetNewStatisticsGroupName(stationId))
+               .UpdatedStationStatistics(stationId, stationStatistics);
         }
     }
 }

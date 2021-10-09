@@ -45,10 +45,6 @@ namespace WeatherHub.FrontEnd
                             logging.AddConsole();
                             logging.AddDebug();
                         }
-                        else
-                        {
-                            logging.AddApplicationInsights(hostingContext.Configuration["ApplicationInsights:InstrumentationKey"]);
-                        }
                     });
                 });
     }

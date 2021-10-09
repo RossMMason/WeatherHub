@@ -9,10 +9,10 @@ namespace WeatherHub.FrontEnd
     using System.Linq;
     using System.Reflection;
     using Autofac;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.SignalR;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -20,11 +20,10 @@ namespace WeatherHub.FrontEnd
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using WeatherHub.Domain;
-    using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Migrations;
     using WeatherHub.Domain.Repositories;
+    using WeatherHub.FrontEnd.Authorization;
     using WeatherHub.FrontEnd.Hubs;
-    using WeatherHub.FrontEnd.Services;
 
     public class Startup
     {
@@ -57,13 +56,25 @@ namespace WeatherHub.FrontEnd
                     });
             });
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("SharedKeyAuthenticationRequirement", policy =>
+                {
+                    policy.Requirements.Add(new SharedKeyAuthenticationRequirement());
+                });
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            services.AddApplicationInsightsTelemetry(Configuration["ApplicationInsightsKey"]);
-
-            services.AddHostedService<WeatherCollector>();
-
-            services.AddSignalR();
+            if (Environment.IsDevelopment())
+            {
+                services.AddSignalR();
+            }
+            else
+            {
+                string signalRConnectionString = Configuration["SignalR:ConnectionString"];
+                services.AddSignalR().AddAzureSignalR(signalRConnectionString);
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -147,33 +158,16 @@ namespace WeatherHub.FrontEnd
             builder.RegisterType<GroupNameGenerator>()
                 .AsSelf();
 
-            builder.Register<Func<WeatherStation, IWeatherDataFetcher>>(c =>
-            {
-                var context = c.Resolve<IComponentContext>();
-
-                return (ws) =>
-                {
-                    switch (ws.FetcherType)
-                    {
-                        case "DavisWeatherlinkFetcher":
-                            return new DavisWeatherlinkFetcher(
-                                context.Resolve<ILogger<DavisWeatherlinkFetcher>>(),
-                                ws,
-                                context.Resolve<IDbContext>(),
-                                context.Resolve<IStationReadingRepository>(),
-                                context.Resolve<IStationDayStatisticsRepository>(),
-                                context.Resolve<IHubContext<StationUpdateHub, IStationUpdateHub>>(),
-                                context.Resolve<GroupNameGenerator>());
-                        default:
-                            throw new Exception($"Unsupported fetcher type: {ws.FetcherType}");
-                    }
-                };
-            });
-
             builder.RegisterAssemblyTypes(new[] { typeof(WeatherHub.Domain.WeatherHubDbContext).Assembly })
                 .Where(x => ((TypeInfo)x).ImplementedInterfaces.Where(y => y.IsGenericType).Any(z => z.GetGenericTypeDefinition() == typeof(IRepository<>)))
                 .AsSelf()
                 .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterInstance(new SharedKeys { SignalRSharedKey = Configuration["SignalRSharedKey"] }).AsSelf();
+
+            builder.RegisterType<SharedKeyAuthenticationRequirementAuthorizationHandler>()
+                .As<IAuthorizationHandler>()
                 .InstancePerLifetimeScope();
         }
     }

@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "SignalRSharedKey": "replace-in-production",
+    "SignalRHubUri": "http://localhost:18489/hubs/station-update-hub",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=.\\SQLEXPRESS;Database=WeatherHub;Trusted_Connection=true;MultipleActiveResultSets=true;"
+  }
+}

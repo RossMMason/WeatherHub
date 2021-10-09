@@ -1,15 +1,19 @@
-using Azure.Storage.Queues;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WeatherHub.Domain.Entities;
-using WeatherHub.Domain.Repositories;
+// <copyright file="QueueNextHoursCollections.cs" company="Ross Mason">
+// Licensed under the MIT License. See LICENSE file in the project root for full license information.
+// </copyright>
 
 namespace WeatherHub.Functions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Azure.Storage.Queues;
+    using Microsoft.Azure.Functions.Worker;
+    using Microsoft.Extensions.Logging;
+    using WeatherHub.Domain.Entities;
+    using WeatherHub.Domain.Repositories;
+
     public class QueueNextHoursCollections
     {
         private readonly ILogger<QueueNextHoursCollections> _logger;
@@ -18,7 +22,7 @@ namespace WeatherHub.Functions
 
         public QueueNextHoursCollections(
             ILogger<QueueNextHoursCollections> logger,
-            IWeatherStationRepository weatherStationRepository, 
+            IWeatherStationRepository weatherStationRepository,
             StorageQueueSettings storageQueueSettings)
         {
             _logger = logger;
@@ -28,29 +32,27 @@ namespace WeatherHub.Functions
 
         // Runs every hour on the hour and is responsible for queueing the next hours data collections
         [Function("QueueNextHoursCollections")]
-        public async Task Run([TimerTrigger("0 * * * * *")] TimerInfo myTimer, FunctionContext context)
+        public async Task Run([TimerTrigger("0 0 * * * *")] TimerInfo myTimer, FunctionContext context)
         {
             var scheduledRunTime = myTimer.ScheduleStatus.Next;
             _logger.LogInformation($"Beginning QueueDavisNextHoursCollections function for {scheduledRunTime:u}.");
 
             var weatherStations = await _weatherStationRepository.GetAllAsync();
 
-            foreach(var weatherStation in weatherStations)
+            foreach (var weatherStation in weatherStations)
             {
-               switch (weatherStation.FetcherType)
-               {
+                switch (weatherStation.FetcherType)
+                {
                     case "DavisWeatherlinkFetcher":
                         await QueueDavisNextHoursCollections(weatherStation);
                         break;
                     default:
                         _logger.LogError($"Unrecognised fetcher type: '{weatherStation.FetcherType}'.");
                         break;
-               }
+                }
             }
 
-
             // Calculate the run times for all weather collectors and send a delayed queue item to the respective queue for the collector for any due in the next hour.
-
         }
 
         private async Task QueueDavisNextHoursCollections(WeatherStation weatherStation)
@@ -126,10 +128,10 @@ namespace WeatherHub.Functions
                 }
             }
 
-            // QueueClient queueClient = new(
-            //    string.Empty, // TODO connection string.
-            //    "davis-station-collections",
-            //    new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });
+            QueueClient queueClient = new (
+                _storageQueueSettings.StorageConnectionString,
+                "davis-station-collections",
+                new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });
 
             DateTime thisHour = new DateTime(
                 DateTime.UtcNow.Year,
@@ -140,7 +142,6 @@ namespace WeatherHub.Functions
                 0,
                 0,
                 DateTimeKind.Utc);
-
 
             foreach (var minutePastHour in minutesPastHour)
             {
@@ -154,7 +155,7 @@ namespace WeatherHub.Functions
 
                 _logger.LogInformation($"Enqueued Davis weather data fetch for station '{weatherStation.Id}' for {fetchTime}.");
 
-                //await queueClient.SendMessageAsync(weatherStation.Id.ToString("D"), fetchDelay);
+                await queueClient.SendMessageAsync(weatherStation.Id.ToString("D"), fetchDelay);
             }
         }
     }

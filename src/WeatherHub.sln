@@ -11,9 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherHub.Domain", "Weathe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherHub.Domain.Migrations", "WeatherHub.Domain.Migrations\WeatherHub.Domain.Migrations.csproj", "{037F4ECC-CDEE-45A8-B79A-28CCD95BA3C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Functions", "WeatherHub.Functions\WeatherHub.Functions.csproj", "{97FBFD9A-7F10-42B6-A839-30E96C481E8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherHub.Functions", "WeatherHub.Functions\WeatherHub.Functions.csproj", "{97FBFD9A-7F10-42B6-A839-30E96C481E8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherHub.Models", "WeatherHub.Models\WeatherHub.Models.csproj", "{090962EF-B96D-4EAE-B6ED-396C0BC48A1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherHub.Models", "WeatherHub.Models\WeatherHub.Models.csproj", "{090962EF-B96D-4EAE-B6ED-396C0BC48A1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
