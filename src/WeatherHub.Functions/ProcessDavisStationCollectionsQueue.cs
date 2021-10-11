@@ -215,6 +215,9 @@ namespace WeatherHub.Functions
                 await stationUpdateHub.SendAsync("UpdatedStationStatistics", weatherStationId, statisticsDto);
             }
 
+            await stationUpdateHub.StopAsync();
+            await stationUpdateHub.DisposeAsync();
+
             _logger.LogInformation($"Processed data collection for weather station: {weatherStationId}");
         }
     }
