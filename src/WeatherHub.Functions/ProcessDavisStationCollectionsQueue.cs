@@ -151,6 +151,8 @@ namespace WeatherHub.Functions
             // Station Reading
             StationReading receivedReading = weatherStationInfo.ToStationReading(weatherStation);
 
+            _logger.LogInformation($"Parsed reading for station: {weatherStationId} reading date: {receivedReading.When}.");
+
             StationReading latestReading = await _stationReadingRepository.FetchLatestReadingAsync(weatherStationId);
             if (latestReading == null || latestReading.When != receivedReading.When)
             {
@@ -168,9 +170,12 @@ namespace WeatherHub.Functions
 
             StationDayStatistics receivedStats = weatherStationInfo.CurrentObservation.ToStationDayStatistics(weatherStation, statisticsDate);
 
+            _logger.LogInformation($"Parsed daily stats for station: {weatherStationId} reading date: {statisticsDate}.");
+
             if (latestDayStatistics == null)
             {
                 _stationDayStatisticsRepository.Create(receivedStats);
+                _logger.LogInformation($"Creating new stats for: {weatherStationId} reading date: {statisticsDate}.");
             }
             else
             {
@@ -199,6 +204,7 @@ namespace WeatherHub.Functions
                 latestDayStatistics.WindHighMph = receivedStats.WindHighMph;
                 latestDayStatistics.WindHighTime = receivedStats.WindHighTime;
                 _stationDayStatisticsRepository.Update(latestDayStatistics);
+                _logger.LogInformation($"Updating stats for: {weatherStationId} reading date: {statisticsDate}.");
             }
 
             await _dbContext.SaveChangesAsync(CancellationToken.None);
