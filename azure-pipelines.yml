@@ -1,8 +1,6 @@
 name: $(Date:yyyy).$(Date:MM).$(Date:dd).$(Rev:r) 
 trigger:
- branches:
-   include:
-     - master
+  - master
 
 pool:
   vmImage: 'windows-latest'
