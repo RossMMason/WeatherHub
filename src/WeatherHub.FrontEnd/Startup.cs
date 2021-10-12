@@ -24,6 +24,7 @@ namespace WeatherHub.FrontEnd
     using WeatherHub.Domain.Repositories;
     using WeatherHub.FrontEnd.Authorization;
     using WeatherHub.FrontEnd.Hubs;
+    using WeatherHub.FrontEnd.JsonConverters;
 
     public class Startup
     {
@@ -64,7 +65,11 @@ namespace WeatherHub.FrontEnd
                 });
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new TimeSpanJsonConverter());
+                });
 
             if (Environment.IsDevelopment())
             {
