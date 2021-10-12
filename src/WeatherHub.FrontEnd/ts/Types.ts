@@ -142,10 +142,6 @@ export class DtoConverter {
         let date = new Date(stationStatisticsDto.dayStatistics.date);
         let dateStr = format(date, 'yyyy-MM-dd');
 
-        alert(typeof (stationStatisticsDto.dayStatistics.windHighTime));
-        alert(dateStr + 'T' + stationStatisticsDto.dayStatistics.windHighTime);
-        alert(parseISO(dateStr + 'T' + stationStatisticsDto.dayStatistics.windHighTime));
-
         let stationDayStatistics: StationDayStatistics = {
             id: stationStatisticsDto.dayStatistics.id,
             date: date,
