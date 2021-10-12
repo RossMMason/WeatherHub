@@ -4,5 +4,12 @@
         <name>WeatherHub.FrontEnd</name>
     </assembly>
     <members>
+        <member name="T:WeatherHub.FrontEnd.JsonConverters.TimeSpanJsonConverter">
+            <summary>
+            Note this converter is only needed until dotnet 6 when a default converter for timespan's should be implemented.
+            At that point we might want to use the default implementation but will need to check the format Microsoft decide to use as there seems to be some debate
+            on whats best at the moment.
+            </summary>
+        </member>
     </members>
 </doc>
