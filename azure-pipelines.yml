@@ -1,4 +1,5 @@
 name: $(Date:yyyy).$(Date:MM).$(Date:dd).$(Rev:r) 
+pr: none
 trigger:
   - master
 
