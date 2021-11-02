@@ -160,16 +160,6 @@ export default class TimeSeriesChart {
         if (dataPoint.seriesData.length != this.numSeries) {
             throw ('Wrong number of series datapoints!');
         }
-
-        /*let convertedSeriesData = dataPoint.seriesData.map((value, index) => {
-            if (this.series[index].unitConverter) {
-                return this.series[index].unitConverter(value);
-            }
-            return value;
-        });
-
-        dataPoint.seriesData = convertedSeriesData;*/
-
         for (let i = 0; i < dataPoint.seriesData.length; i++) {
             if (this.series[i].unitConverter) {
                 dataPoint.seriesData[i] = this.series[i].unitConverter(dataPoint.seriesData[i]);
@@ -379,7 +369,7 @@ export default class TimeSeriesChart {
             dateLabel.setAttribute('y', this.dateCentreY.toString());
             dateLabel.setAttribute('text-anchor', 'middle');
             dateLabel.setAttribute('dominant-baseline', 'middle');
-            dateLabel.innerHTML = format(date, 'Do MMM yy')
+            dateLabel.innerHTML = format(date, 'dd MMM yy')
             dateLabel.setAttribute('style', 'font: 10px sans-serif; fill: ' + this.labelColor + ';font-weight: bold');
             this.chartSvg.appendChild(dateLabel);
         }
