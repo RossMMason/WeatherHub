@@ -225,7 +225,7 @@ export default class TimeSeriesChart {
             gPoint.setAttribute('cx', x.toString());
             gPoint.setAttribute('cy', timeSeriesChart.yZeroPosition.toString());
             gPoint.setAttribute('r', '2');
-            gPoint.setAttribute('style', 'stroke:' + timeSeriesChart.series[seriesIndex].color + ';stroke-width:2; fill: none;');
+            gPoint.setAttribute('style', 'stroke:' + timeSeriesChart.series[seriesIndex].color + ';stroke-width:0; fill:' + timeSeriesChart.series[seriesIndex].color +';');
 
             let gPointAnimation  = document.createElementNS(svgns, 'animateTransform') as SVGElement;
             gPointAnimation.setAttribute('attributeName', 'transform');
