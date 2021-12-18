@@ -110,16 +110,15 @@ namespace WeatherHub.Functions
                 return;
             }
 
-            // We pickup at 1 minute past the period type to give the weather station time to generate the record.
             List<int> minutesPastHour = new List<int>();
 
             if (pickupPeriod == 60)
             {
-                minutesPastHour.Add(1);
+                minutesPastHour.Add(0);
             }
             else
             {
-                var thisPeriod = 1;
+                var thisPeriod = 0;
 
                 while (thisPeriod < 60)
                 {
@@ -145,17 +144,20 @@ namespace WeatherHub.Functions
 
             foreach (var minutePastHour in minutesPastHour)
             {
-                DateTime fetchTime = thisHour.AddMinutes(minutePastHour);
-                TimeSpan fetchDelay = fetchTime - DateTime.UtcNow;
+                // We pickup at 1 minute past the period type to give the weather station time to generate the record.
+                DateTime reportEpoch = thisHour.AddMinutes(minutePastHour);
+                DateTime initialFetchEpoch = thisHour.AddMinutes(minutePastHour + 1);
+                TimeSpan fetchDelay = initialFetchEpoch - DateTime.UtcNow;
 
                 if (fetchDelay < TimeSpan.Zero)
                 {
                     continue;
                 }
 
-                _logger.LogInformation($"Enqueued Davis weather data fetch for station '{weatherStation.Id}' for {fetchTime}.");
+                _logger.LogInformation($"Enqueued Davis weather data fetch for station '{weatherStation.Id}' for report epoch: {reportEpoch:u},  initial fetch epoch: {initialFetchEpoch:u}.");
 
-                await queueClient.SendMessageAsync(weatherStation.Id.ToString("D"), fetchDelay);
+                // 1 here denotes the collection attempt number for this report epoch
+                await queueClient.SendMessageAsync($"{weatherStation.Id:D}|{reportEpoch:u}|1", fetchDelay);
             }
         }
     }
