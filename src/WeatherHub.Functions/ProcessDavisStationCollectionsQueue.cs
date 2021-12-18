@@ -9,6 +9,7 @@ namespace WeatherHub.Functions
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
+    using Azure.Storage.Queues;
     using Microsoft.AspNetCore.SignalR.Client;
     using Microsoft.Azure.Functions.Worker;
     using Microsoft.Extensions.Logging;
@@ -28,6 +29,7 @@ namespace WeatherHub.Functions
         private readonly IStationReadingRepository _stationReadingRepository;
         private readonly IStationDayStatisticsRepository _stationDayStatisticsRepository;
         private readonly IDbContext _dbContext;
+        private readonly StorageQueueSettings _storageQueueSettings;
 
         public ProcessDavisStationCollectionsQueue(
             ILogger<ProcessDavisStationCollectionsQueue> logger,
@@ -35,27 +37,44 @@ namespace WeatherHub.Functions
             IWeatherStationRepository weatherStationRepository,
             IStationReadingRepository stationReadingRepository,
             IStationDayStatisticsRepository stationDayStatisticsRepository,
-            IDbContext dbContext)
+            IDbContext dbContext,
+            StorageQueueSettings storageQueueSettings)
         {
+            _logger = logger;
             _signalRSettings = signalRSettings;
             _weatherStationRepository = weatherStationRepository;
             _stationReadingRepository = stationReadingRepository;
             _stationDayStatisticsRepository = stationDayStatisticsRepository;
             _dbContext = dbContext;
-            _logger = logger;
+            _storageQueueSettings = storageQueueSettings;
         }
 
         [Function("ProcessDavisStationCollectionsQueue")]
         public async Task Run(
             [QueueTrigger("davis-station-collections")] string queueItem)
         {
-            if (!Guid.TryParse(queueItem, out Guid weatherStationId))
+            // Queue item format is seperated by pipes: "[weather station ID]|[report epoch]|[collection attempt number]"
+            string[] queueItemParts = queueItem.Split('|');
+
+            if (!Guid.TryParse(queueItemParts[0], out Guid weatherStationId))
             {
-                _logger.LogError($"Could not parse queue item: '{queueItem}'.");
+                _logger.LogError($"Could not parse weather station id from queue item: '{queueItem}'.");
                 return;
             }
 
-            _logger.LogInformation($"Processing data collection for weather station: {weatherStationId}");
+            if (!DateTime.TryParse(queueItemParts[1], out DateTime reportEpoch))
+            {
+                _logger.LogError($"Could not parse report epoch from queue item: '{queueItem}'.");
+                return;
+            }
+
+            if (!int.TryParse(queueItemParts[2], out int collectionAttemptNumber))
+            {
+                _logger.LogError($"Could not parse collection attempt number from queue item: '{queueItem}'.");
+                return;
+            }
+
+            _logger.LogInformation($"Processing data collection for weather station: {weatherStationId}, report epoch: {reportEpoch:u}, collection attempt: {collectionAttemptNumber}");
 
             HttpResponseMessage httpResponse;
 
@@ -129,6 +148,41 @@ namespace WeatherHub.Functions
                 return;
             }
 
+            string responseBody = await httpResponse.Content.ReadAsStringAsync();
+            var weatherStationInfo = JsonConvert.DeserializeObject<NoaaExtResult>(responseBody);
+
+            // Station Reading
+            StationReading receivedReading = weatherStationInfo.ToStationReading(weatherStation);
+
+            _logger.LogInformation($"Parsed reading for station: {weatherStationId} reading date: {receivedReading.When:u}.");
+
+            // This is not the report we were looking for! Maybe queue another attempt?
+            if (receivedReading.When != reportEpoch)
+            {
+                if (collectionAttemptNumber < 3)
+                {
+                    QueueClient queueClient = new (
+                        _storageQueueSettings.StorageConnectionString,
+                        "davis-station-collections",
+                        new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 });
+
+                    int nextCollectionNumber = collectionAttemptNumber + 1;
+                    DateTime nextAttemptEpoch = reportEpoch.AddMinutes(nextCollectionNumber);
+                    TimeSpan nextAttemptDelay = DateTime.UtcNow - nextAttemptEpoch;
+
+                    // 1 here denotes the collection attempt number for this report epoch
+                    await queueClient.SendMessageAsync($"{weatherStation.Id:D}|{reportEpoch:u}|{nextCollectionNumber}", nextAttemptDelay);
+
+                    _logger.LogWarning($"Attempt to receive report: {reportEpoch:u} but recieved: {receivedReading.When:u} for attempt {collectionAttemptNumber} @ {DateTime.UtcNow:u}. Enqueed another attempt at: {nextAttemptEpoch:u}.");
+                }
+                else
+                {
+                    _logger.LogError($"Attempt to receive report: {reportEpoch:u} but recieved: {receivedReading.When:u} for attempt {collectionAttemptNumber} @ {DateTime.UtcNow:u}. Not enqueuing another attempt.");
+                }
+
+                return;
+            }
+
             var stationUpdateHub = new HubConnectionBuilder()
                 .WithUrl(_signalRSettings.HubUri, connectionOptions =>
                 {
@@ -144,14 +198,6 @@ namespace WeatherHub.Functions
             {
                 _logger.LogError(ex, $"Error connecting to Signal R server. This will effect the real time updating of information in the widget.");
             }
-
-            string responseBody = await httpResponse.Content.ReadAsStringAsync();
-            var weatherStationInfo = JsonConvert.DeserializeObject<NoaaExtResult>(responseBody);
-
-            // Station Reading
-            StationReading receivedReading = weatherStationInfo.ToStationReading(weatherStation);
-
-            _logger.LogInformation($"Parsed reading for station: {weatherStationId} reading date: {receivedReading.When}.");
 
             StationReading latestReading = await _stationReadingRepository.FetchLatestReadingAsync(weatherStationId);
             if (latestReading == null || latestReading.When != receivedReading.When)
