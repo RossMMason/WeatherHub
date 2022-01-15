@@ -7,13 +7,13 @@ namespace WeatherHub.Functions
     using System;
     using System.Linq;
     using System.Net.Http;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
     using Azure.Storage.Queues;
     using Microsoft.AspNetCore.SignalR.Client;
     using Microsoft.Azure.Functions.Worker;
     using Microsoft.Extensions.Logging;
-    using Newtonsoft.Json;
     using WeatherHub.Domain;
     using WeatherHub.Domain.Entities;
     using WeatherHub.Domain.Repositories;
@@ -30,6 +30,7 @@ namespace WeatherHub.Functions
         private readonly IStationDayStatisticsRepository _stationDayStatisticsRepository;
         private readonly IDbContext _dbContext;
         private readonly StorageQueueSettings _storageQueueSettings;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public ProcessDavisStationCollectionsQueue(
             ILogger<ProcessDavisStationCollectionsQueue> logger,
@@ -38,7 +39,8 @@ namespace WeatherHub.Functions
             IStationReadingRepository stationReadingRepository,
             IStationDayStatisticsRepository stationDayStatisticsRepository,
             IDbContext dbContext,
-            StorageQueueSettings storageQueueSettings)
+            StorageQueueSettings storageQueueSettings,
+            IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _signalRSettings = signalRSettings;
@@ -47,6 +49,7 @@ namespace WeatherHub.Functions
             _stationDayStatisticsRepository = stationDayStatisticsRepository;
             _dbContext = dbContext;
             _storageQueueSettings = storageQueueSettings;
+            _httpClientFactory = httpClientFactory;
         }
 
         [Function("ProcessDavisStationCollectionsQueue")]
@@ -130,16 +133,14 @@ namespace WeatherHub.Functions
 
             try
             {
-                using (HttpClient client = new HttpClient())
-                {
-                    var requestUrl = $"https://api.weatherlink.com/v1/NoaaExt.json?user={userSetting.Value}&pass={passwordSetting.Value}&apiToken={apiTokenSetting.Value}";
-                    httpResponse = await client.GetAsync(requestUrl);
+                HttpClient client = _httpClientFactory.CreateClient();
+                var requestUrl = $"https://api.weatherlink.com/v1/NoaaExt.json?user={userSetting.Value}&pass={passwordSetting.Value}&apiToken={apiTokenSetting.Value}";
+                httpResponse = await client.GetAsync(requestUrl);
 
-                    if (!httpResponse.IsSuccessStatusCode)
-                    {
-                        _logger.LogError($"Could not query weather API for station with id: {weatherStationId}. Response code was {httpResponse.StatusCode}");
-                        return;
-                    }
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Could not query weather API for station with id: {weatherStationId}. Response code was {httpResponse.StatusCode}");
+                    return;
                 }
             }
             catch (Exception ex)
@@ -149,7 +150,7 @@ namespace WeatherHub.Functions
             }
 
             string responseBody = await httpResponse.Content.ReadAsStringAsync();
-            var weatherStationInfo = JsonConvert.DeserializeObject<NoaaExtResult>(responseBody);
+            var weatherStationInfo = JsonSerializer.Deserialize<NoaaExtResult>(responseBody);
 
             // Station Reading
             StationReading receivedReading = weatherStationInfo.ToStationReading(weatherStation);
