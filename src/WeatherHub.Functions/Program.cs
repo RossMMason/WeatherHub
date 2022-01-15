@@ -54,6 +54,8 @@ namespace WeatherHub.Functions
                             SharedKey = hostContext.Configuration.GetValue<string>("SignalRSharedKey"),
                         };
                     });
+
+                    services.AddHttpClient();
                 })
                 .Build();
 
