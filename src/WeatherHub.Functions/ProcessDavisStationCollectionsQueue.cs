@@ -150,6 +150,9 @@ namespace WeatherHub.Functions
             }
 
             string responseBody = await httpResponse.Content.ReadAsStringAsync();
+
+            _logger.LogInformation(responseBody);
+
             var weatherStationInfo = JsonSerializer.Deserialize<NoaaExtResult>(responseBody);
 
             // Station Reading
