@@ -34,27 +34,27 @@ steps:
     arguments: '--filter Category!=NotOnBuildServer'
     testRunTitle: 'Build server tests'
 
-- task: Npm@1
-  displayName: 'Running npm install on front end'
-  inputs:
-    command: 'install'
-    workingDir: '$(Build.SourcesDirectory)/src/WeatherHub.FrontEnd'
+#- task: Npm@1
+#  displayName: 'Running npm install on front end'
+#  inputs:
+#    command: 'install'
+#    workingDir: '$(Build.SourcesDirectory)/src/WeatherHub.FrontEnd'
 
-- task: Npm@1
-  displayName: 'Running npm publish on front end'
-  inputs:
-    command: 'custom'
-    workingDir: '$(Build.SourcesDirectory)/src/WeatherHub.FrontEnd'
-    customCommand: 'run publish'
+#- task: Npm@1
+#  displayName: 'Running npm publish on front end'
+#  inputs:
+#    command: 'custom'
+#    workingDir: '$(Build.SourcesDirectory)/src/WeatherHub.FrontEnd'
+#    customCommand: 'run publish'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Publish front end to artifacts'
-  inputs:
-    command: 'publish'
-    projects: '$(Build.SourcesDirectory)/src/WeatherHub.FrontEnd/WeatherHub.FrontEnd.csproj'
-    publishWebProjects: false
-    zipAfterPublish: true
-    arguments: '-r win-x64 -p:Platform=x64 --output "$(build.artifactStagingDirectory)"'
+#- task: DotNetCoreCLI@2
+#  displayName: 'Publish front end to artifacts'
+#  inputs:
+#    command: 'publish'
+#    projects: '$(Build.SourcesDirectory)/src/WeatherHub.FrontEnd/WeatherHub.FrontEnd.csproj'
+#    publishWebProjects: false
+#    zipAfterPublish: true
+#    arguments: '-r win-x64 -p:Platform=x64 --output "$(build.artifactStagingDirectory)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish functions to artifacts'
