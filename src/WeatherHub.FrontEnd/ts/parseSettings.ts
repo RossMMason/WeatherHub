@@ -11,7 +11,7 @@ export const parseSettings = (settings: any) => {
         temperatureUnits: 'C'
     }
 
-    let colorRegex = /^#([0-9A-F]{3}|[0-9A-F]{6})$/ig.compile();
+    let colorRegex =  /^#([0 - 9A - F]{ 3} | [0 - 9A - F]{ 6})$/
 
     if (settings.primaryColor) {
         if (isString(settings.primaryColor)
