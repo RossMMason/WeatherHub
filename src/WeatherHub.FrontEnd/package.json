@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@aspnet/signalr": "^1.0.27",
-    "axios": "^0.22.0"
+    "axios": "^1.10.0"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^4.0.0",

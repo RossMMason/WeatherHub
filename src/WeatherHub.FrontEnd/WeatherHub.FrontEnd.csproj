@@ -17,17 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="sample\index.html" />
-    <None Remove="ts\DataBoxLayout.ts" />
-    <None Remove="ts\DataLookup.ts" />
-    <None Remove="ts\parseSettings.ts" />
-    <None Remove="ts\StationUpdateHub.ts" />
-    <None Remove="ts\TimeSeriesChart.ts" />
-    <None Remove="ts\Types.ts" />
-    <None Remove="ts\UnitConverter.ts" />
-    <None Remove="ts\WeatherHubWidget.ts" />
-    <None Remove="ts\WindRose.ts" />
-    <None Remove="widgets\weather-hub-widget.js" />
+
   </ItemGroup>
 
   <ItemGroup>

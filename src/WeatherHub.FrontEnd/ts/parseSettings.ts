@@ -11,14 +11,14 @@ export const parseSettings = (settings: any) => {
         temperatureUnits: 'C'
     }
 
-    let colorRegex =  /^#([0 - 9A - F]{ 3} | [0 - 9A - F]{ 6})$/
+    let colorRegex =  /^#([0-9A-F]{3}|[0-9A-F]{6})$/i
 
     if (settings.primaryColor) {
         if (isString(settings.primaryColor)
             && colorRegex.test(settings.primaryColor)) {
             parsedSettings.primaryColor = settings.primaryColor
         } else {
-            console.warn('Incorrect primary color provided. Using default value.')
+            console.warn(`Incorrect primary color '${settings.primaryColor}' provided. Using default value.`)
         }
     }
 
@@ -27,7 +27,7 @@ export const parseSettings = (settings: any) => {
             && colorRegex.test(settings.secondaryColor)) {
             parsedSettings.secondaryColor = settings.secondaryColor
         } else {
-            console.warn('Incorrect secondary color provided. Using default value.')
+            console.warn(`Incorrect secondary color '${settings.secondaryColor}' provided. Using default value.`)
         }
     }
 
@@ -36,7 +36,7 @@ export const parseSettings = (settings: any) => {
             && colorRegex.test(settings.labelColor)) {
             parsedSettings.labelColor = settings.labelColor
         } else {
-            console.warn('Incorrect label color provided. Using default value.')
+            console.warn(`Incorrect label color '${settings.labelColor}' provided. Using default value.`)
         }
     }
 
